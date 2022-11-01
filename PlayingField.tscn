@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://tiles.tres" type="TileSet" id=1]
+[ext_resource path="res://GameLogic.gd" type="Script" id=2]
+
+[node name="PlayingField" type="Node2D"]
+
+[node name="TileMap" type="TileMap" parent="."]
+tile_set = ExtResource( 1 )
+cell_size = Vector2( 16, 16 )
+format = 1
+tile_data = PoolIntArray( 0, 9, 0, 1, 9, 0, 2, 9, 0, 3, 9, 0, 4, 9, 0, 65536, 9, 0, 65540, 9, 0, 131072, 9, 0, 131074, 8, 0, 131076, 9, 0, 196608, 9, 0, 196612, 9, 0, 262144, 9, 0, 262145, 9, 0, 262146, 10, 0, 262147, 9, 0, 262148, 9, 0 )
+
+[node name="GameLogic" type="Node" parent="."]
+script = ExtResource( 2 )
