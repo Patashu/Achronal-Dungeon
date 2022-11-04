@@ -22,6 +22,8 @@ var greenality_max = 0;
 var greenality_avail = 0;
 var pickaxes = 0;
 var warpwings = 0;
+var green_tutorial_message_seen = false;
+var greenality_tutorial_message_seen = false;
 
 func _ready() -> void:
 	# setup hero info
@@ -83,22 +85,28 @@ func consume_item(dest_loc: Vector2) -> void:
 	var multiplier_val = multiplier_id_to_number(multiplier_dest)
 	var dest_to_use = floormap.get_cellv(dest_loc);
 	var dest_name = floormap.tile_set.tile_get_name(dest_to_use).to_lower();
-	# TODO: handle green
-	add_undo_event(["destroy", dest_loc, dest_name, multiplier_val]);
+	var is_green = "green" in dest_name;
+	add_undo_event(["destroy", dest_loc, dest_name, multiplier_val], is_green);
 	floormap.set_cellv(dest_loc, -1);
 	multipliermap.set_cellv(dest_loc, -1);
+	var message = "";
 	if ("potion" in dest_name):
-		add_undo_event(["gain_hp", multiplier_val]);
+		add_undo_event(["gain_hp", multiplier_val], is_green);
 		hero_hp += multiplier_val;
-		print_message("You drink the " + name_thing(dest_name, multiplier_val) + " and gain " + str(multiplier_val) + " HP!");
+		message = "You drink the " + name_thing(dest_name, multiplier_val) + " and gain " + str(multiplier_val) + " HP!";
 	if ("sword" in dest_name):
-		add_undo_event(["gain_atk", multiplier_val]);
+		add_undo_event(["gain_atk", multiplier_val], is_green);
 		hero_atk += multiplier_val;
-		print_message("You take the " + name_thing(dest_name, multiplier_val) + " and gain " + str(multiplier_val) + " ATK!");
+		message = "You take the " + name_thing(dest_name, multiplier_val) + " and gain " + str(multiplier_val) + " ATK!";
 	if ("shield" in dest_name):
-		add_undo_event(["gain_def", multiplier_val]);
+		add_undo_event(["gain_def", multiplier_val], is_green);
 		hero_def += multiplier_val;
-		print_message("You take the " + name_thing(dest_name, multiplier_val) + " and gain " + str(multiplier_val) + " DEF!");
+		message = "You take the " + name_thing(dest_name, multiplier_val) + " and gain " + str(multiplier_val) + " DEF!";
+	if (!green_tutorial_message_seen):
+		green_tutorial_message_seen = true;
+		message += " GREEN changes persist through undo (z) and restart (r)."
+		pass
+	print_message(message);
 		
 func move_hero_commit(dir: Vector2) -> void:
 	add_undo_event(["move", hero_loc]);
@@ -112,40 +120,64 @@ func move_hero_silently(dir: Vector2) -> void:
 	hero_loc += dir;
 	actormap.set_cellv(hero_loc, actormap.tile_set.find_tile_by_name("Player"));
 
-func add_undo_event(event: Array) -> void:
-	if (undo_buffer.size() <= hero_turn):
-		undo_buffer.append([]);
-	undo_buffer[hero_turn].append(event);
+func add_undo_event(event: Array, is_green = false) -> void:
+	if (!is_green):
+		if (undo_buffer.size() <= hero_turn):
+			undo_buffer.append([]);
+		undo_buffer[hero_turn].append(event);
+	else:
+		meta_undo_buffer.append(event);
 
 func print_message(message: String)-> void:
 	lastmessage.text = message;
+
+func meta_restart() -> void:
+	restart();
+	# fine as long as doing undo and meta undo events in arbitrary order commutes.
+	# might get weird with Green Player, I'll have to test some things or maybe just hard code it.
+	for event in meta_undo_buffer:
+		undo_one_event(event);
+	meta_undo_buffer = [];
+	hero_keypresses = 0;
+	greenality_avail = greenality_max;
+	update_hero_info();
+
+func restart() -> void:
+	var hero_keypresses_temp = hero_keypresses;
+	while (hero_turn > 0):
+		undo();
+	hero_keypresses = hero_keypresses_temp + 1;
+	update_hero_info();
 
 func undo() -> void:
 	if (hero_turn <= 0):
 		return
 	var events = undo_buffer.pop_back();
 	for event in events:
-		if (event[0] == "move"):
-			move_hero_silently(event[1] - hero_loc);
-		elif (event[0] == "win"):
-			has_won = false;
-		elif (event[0] == "destroy"):
-			var dest_loc = event[1];
-			var dest_name = event[2];
-			var multiplier_val = event[3];
-			floormap.set_cellv(dest_loc, floormap.tile_set.find_tile_by_name(dest_name.capitalize()));
-			if (multiplier_val > 1):
-				multipliermap.set_cellv(dest_loc, multipliermap.tile_set.find_tile_by_name(str(multiplier_val)));
-		elif (event[0] == "gain_hp"):
-			hero_hp -= event[1];
-		elif (event[0] == "gain_atk"):
-			hero_atk -= event[1];
-		elif (event[0] == "gain_def"):
-			hero_def -= event[1];
+		undo_one_event(event);
 		
 	hero_turn -= 1;
 	hero_keypresses += 1;
 	update_hero_info();
+
+func undo_one_event(event: Array) -> void:
+	if (event[0] == "move"):
+		move_hero_silently(event[1] - hero_loc);
+	elif (event[0] == "win"):
+		has_won = false;
+	elif (event[0] == "destroy"):
+		var dest_loc = event[1];
+		var dest_name = event[2];
+		var multiplier_val = event[3];
+		floormap.set_cellv(dest_loc, floormap.tile_set.find_tile_by_name(dest_name.capitalize()));
+		if (multiplier_val > 1):
+			multipliermap.set_cellv(dest_loc, multipliermap.tile_set.find_tile_by_name(str(multiplier_val)));
+	elif (event[0] == "gain_hp"):
+		hero_hp -= event[1];
+	elif (event[0] == "gain_atk"):
+		hero_atk -= event[1];
+	elif (event[0] == "gain_def"):
+		hero_def -= event[1];
 
 func update_hover_info() -> void:
 	var dest_loc = floormap.world_to_map(get_viewport().get_mouse_position());
@@ -313,6 +345,10 @@ func _process(delta: float) -> void:
 	update_hover_info();
 	if (Input.is_action_just_pressed("undo")):
 		undo();
+	if (Input.is_action_just_pressed("restart")):
+		restart();
+	if (Input.is_action_just_pressed("meta_restart")):
+		meta_restart();
 	if (has_won):
 		return;
 	if (Input.is_action_just_pressed("ui_left")):
