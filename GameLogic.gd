@@ -17,6 +17,11 @@ var hero_turn = 0;
 var hero_keypresses = 0;
 var has_won = false;
 var undo_buffer = [];
+var meta_undo_buffer = [];
+var greenality_max = 0;
+var greenality_avail = 0;
+var pickaxes = 0;
+var warpwings = 0;
 
 func _ready() -> void:
 	# setup hero info
@@ -39,11 +44,19 @@ func update_hero_info() -> void:
 
 func move_hero(dir: Vector2) -> void:
 	# check multiplier, actor and floor at destination
+	# note: for now I'm putting only the player in the actor layer...
+	# and ONLY because the player might overlap things (most notably the goal)
 	var dest_loc = hero_loc + dir;
 	var multiplier_dest = multipliermap.get_cellv(dest_loc);
 	var actor_dest = actormap.get_cellv(dest_loc);
 	var floor_dest = floormap.get_cellv(dest_loc);
 	var can_move = false;
+	var dest_to_use = actor_dest;
+	if (dest_to_use == -1):
+		dest_to_use = floor_dest;
+	var dest_name = "";
+	if (dest_to_use > -1):
+		dest_name = floormap.tile_set.tile_get_name(dest_to_use).to_lower();
 	# no going out of bounds, please
 	if (dest_loc.x < 0 || dest_loc.x > 31 || dest_loc.y < 0 || dest_loc.y > 20):
 		print_message("Space and time don't exist out of bounds, sorry.")
@@ -55,12 +68,37 @@ func move_hero(dir: Vector2) -> void:
 	# empty tile's fine to move into
 	if (actor_dest == -1 && floor_dest == -1):
 		can_move = true;
-	if (floor_dest == floormap.tile_set.find_tile_by_name("Win")):
+	if ("potion" in dest_name) or ("sword" in dest_name) or ("shield" in dest_name):
+		can_move = true;
+		consume_item(dest_loc);
+	if ("win" in dest_name):
 		can_move = true;
 		has_won = true;
 		add_undo_event(["win"]);
 	if (can_move):
 		move_hero_commit(dir);
+		
+func consume_item(dest_loc: Vector2) -> void:
+	var multiplier_dest = multipliermap.get_cellv(dest_loc);
+	var multiplier_val = multiplier_id_to_number(multiplier_dest)
+	var dest_to_use = floormap.get_cellv(dest_loc);
+	var dest_name = floormap.tile_set.tile_get_name(dest_to_use).to_lower();
+	# TODO: handle green
+	add_undo_event(["destroy", dest_loc, dest_name, multiplier_val]);
+	floormap.set_cellv(dest_loc, -1);
+	multipliermap.set_cellv(dest_loc, -1);
+	if ("potion" in dest_name):
+		add_undo_event(["gain_hp", multiplier_val]);
+		hero_hp += multiplier_val;
+		print_message("You drink the " + name_thing(dest_name, multiplier_val) + " and gain " + str(multiplier_val) + " HP!");
+	if ("sword" in dest_name):
+		add_undo_event(["gain_atk", multiplier_val]);
+		hero_atk += multiplier_val;
+		print_message("You take the " + name_thing(dest_name, multiplier_val) + " and gain " + str(multiplier_val) + " ATK!");
+	if ("shield" in dest_name):
+		add_undo_event(["gain_def", multiplier_val]);
+		hero_def += multiplier_val;
+		print_message("You take the " + name_thing(dest_name, multiplier_val) + " and gain " + str(multiplier_val) + " DEF!");
 		
 func move_hero_commit(dir: Vector2) -> void:
 	add_undo_event(["move", hero_loc]);
@@ -91,6 +129,20 @@ func undo() -> void:
 			move_hero_silently(event[1] - hero_loc);
 		elif (event[0] == "win"):
 			has_won = false;
+		elif (event[0] == "destroy"):
+			var dest_loc = event[1];
+			var dest_name = event[2];
+			var multiplier_val = event[3];
+			floormap.set_cellv(dest_loc, floormap.tile_set.find_tile_by_name(dest_name.capitalize()));
+			if (multiplier_val > 1):
+				multipliermap.set_cellv(dest_loc, multipliermap.tile_set.find_tile_by_name(str(multiplier_val)));
+		elif (event[0] == "gain_hp"):
+			hero_hp -= event[1];
+		elif (event[0] == "gain_atk"):
+			hero_atk -= event[1];
+		elif (event[0] == "gain_def"):
+			hero_def -= event[1];
+		
 	hero_turn -= 1;
 	hero_keypresses += 1;
 	update_hero_info();
@@ -116,56 +168,13 @@ func update_hover_info() -> void:
 	
 	# this is all gross. I guess I 'should' use json and helper functions and whatnot.
 	
-	var dest_name = floormap.tile_set.tile_get_name(dest_to_use).to_lower();
-	if (("green" in dest_name) and not ("greenality" in dest_name)):
-		hoverinfo.text = "Green ";
-		
-	if ("player" in dest_name):
-		hoverinfo.text += "Player";
-		
-	if ("win" == dest_name):
-		hoverinfo.text += "Goal";
-		
-	if ("wall" in dest_name):
-		hoverinfo.text += "Wall";
-		
-	if ("potion" in dest_name):
-		hoverinfo.text += "Potion";
-		
-	if ("sword" in dest_name):
-		hoverinfo.text += "Sword";
-	
-	if ("shield" in dest_name):
-		hoverinfo.text += "Shield";
-		
-	if ("enemy1" in dest_name):
-		hoverinfo.text += "Guard";
-		
-	if ("fire" in dest_name):
-		hoverinfo.text += "Fire";
-		
-	if ("slime" in dest_name):
-		hoverinfo.text += "Slime";
-		
-	if ("teeth" in dest_name):
-		hoverinfo.text += "Teeth";
-		
-	if ("greenality" in dest_name):
-		hoverinfo.text += "Greenality";
-		
-	if ("pickaxe" in dest_name):
-		hoverinfo.text += "Pickaxe";
-		
-	if ("warpwings" in dest_name):
-		hoverinfo.text += "Warp Wings";
-		
-	if ("magicmirror" in dest_name):
-		hoverinfo.text += "Magic Mirror";
-	
 	if (multiplier_val > 1):
 		hoversprite2.texture = multipliermap.tile_set.tile_get_texture(multiplier_dest);
-		hoverinfo.text += "(x" + str(multiplier_val) + ")"
-		
+	
+	var dest_name = floormap.tile_set.tile_get_name(dest_to_use).to_lower();
+	
+	hoverinfo.text = name_thing(dest_name, multiplier_val);
+	
 	if ("player" in dest_name):
 		hoverinfo.text += "\nIt's you! wasd/arrows to move, z to undo, r to restart.";
 		
@@ -204,6 +213,59 @@ func update_hover_info() -> void:
 	
 	if (("green" in dest_name) and not ("greenality" in dest_name)):
 		add_green_reminder();
+
+func name_thing(dest_name: String, multiplier_val: int) -> String:
+	var result = "";
+	
+	if (("green" in dest_name) and not ("greenality" in dest_name)):
+		result = "Green ";
+		
+	if ("player" in dest_name):
+		result += "Player";
+		
+	if ("win" == dest_name):
+		result += "Goal";
+		
+	if ("wall" in dest_name):
+		result += "Wall";
+		
+	if ("potion" in dest_name):
+		result += "Potion";
+		
+	if ("sword" in dest_name):
+		result += "Sword";
+	
+	if ("shield" in dest_name):
+		result += "Shield";
+		
+	if ("enemy1" in dest_name):
+		result += "Guard";
+		
+	if ("fire" in dest_name):
+		result += "Fire";
+		
+	if ("slime" in dest_name):
+		result += "Slime";
+		
+	if ("teeth" in dest_name):
+		result += "Teeth";
+		
+	if ("greenality" in dest_name):
+		result += "Greenality";
+		
+	if ("pickaxe" in dest_name):
+		result += "Pickaxe";
+		
+	if ("warpwings" in dest_name):
+		result += "Warp Wings";
+		
+	if ("magicmirror" in dest_name):
+		result += "Magic Mirror";
+	
+	if (multiplier_val > 1):
+		result += "(x" + str(multiplier_val) + ")"
+	
+	return result;
 
 func add_green_reminder() -> void:
 	hoverinfo.text += "\n\nInteracting with a Green thing persists through UNDO (z) and RESTART (r)."
