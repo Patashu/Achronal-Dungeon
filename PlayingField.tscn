@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://GameLogic.gd" type="Script" id=2]
+[ext_resource path="res://assets/player.png" type="Texture" id=3]
+[ext_resource path="res://assets/1.png" type="Texture" id=4]
 
 [node name="PlayingField" type="Node2D"]
 
@@ -9,7 +11,7 @@
 tile_set = ExtResource( 1 )
 cell_size = Vector2( 16, 16 )
 format = 1
-tile_data = PoolIntArray( 0, 9, 0, 1, 9, 0, 2, 9, 0, 3, 9, 0, 4, 9, 0, 65536, 9, 0, 65540, 9, 0, 131072, 9, 0, 131076, 9, 0, 196608, 9, 0, 196612, 9, 0, 262144, 9, 0, 262145, 9, 0, 262146, 10, 0, 262147, 9, 0, 262148, 9, 0 )
+tile_data = PoolIntArray( 0, 9, 0, 1, 9, 0, 2, 9, 0, 3, 9, 0, 4, 9, 0, 5, 9, 0, 6, 9, 0, 7, 9, 0, 8, 9, 0, 9, 9, 0, 10, 9, 0, 11, 9, 0, 12, 9, 0, 13, 9, 0, 14, 9, 0, 15, 9, 0, 16, 9, 0, 17, 9, 0, 18, 9, 0, 19, 9, 0, 20, 9, 0, 21, 9, 0, 22, 9, 0, 23, 9, 0, 24, 9, 0, 25, 9, 0, 26, 9, 0, 27, 9, 0, 28, 9, 0, 29, 9, 0, 30, 9, 0, 31, 9, 0, 65536, 9, 0, 65539, 7, 0, 65567, 9, 0, 131072, 9, 0, 131079, 34, 0, 131103, 9, 0, 196609, 2, 0, 196613, 27, 0, 196639, 9, 0, 262144, 9, 0, 262145, 0, 0, 262148, 3, 0, 262175, 9, 0, 327680, 9, 0, 327681, 1, 0, 327683, 24, 0, 327686, 35, 0, 327711, 9, 0, 393216, 9, 0, 393221, 37, 0, 393247, 9, 0, 458752, 9, 0, 458754, 4, 0, 458759, 25, 0, 458783, 9, 0, 524288, 9, 0, 524319, 9, 0, 589824, 9, 0, 589855, 9, 0, 655360, 9, 0, 655391, 9, 0, 720896, 9, 0, 720927, 9, 0, 786432, 9, 0, 786463, 9, 0, 851968, 9, 0, 851999, 9, 0, 917504, 9, 0, 917535, 9, 0, 983040, 9, 0, 983071, 9, 0, 1048576, 9, 0, 1048607, 9, 0, 1114112, 9, 0, 1114143, 9, 0, 1179648, 9, 0, 1179679, 9, 0, 1245184, 9, 0, 1245215, 10, 0, 1310720, 9, 0, 1310721, 9, 0, 1310722, 9, 0, 1310723, 9, 0, 1310724, 9, 0, 1310725, 9, 0, 1310726, 9, 0, 1310727, 9, 0, 1310728, 9, 0, 1310729, 9, 0, 1310730, 9, 0, 1310731, 9, 0, 1310732, 9, 0, 1310733, 9, 0, 1310734, 9, 0, 1310735, 9, 0, 1310736, 9, 0, 1310737, 9, 0, 1310738, 9, 0, 1310739, 9, 0, 1310740, 9, 0, 1310741, 9, 0, 1310742, 9, 0, 1310743, 9, 0, 1310744, 9, 0, 1310745, 9, 0, 1310746, 9, 0, 1310747, 9, 0, 1310748, 9, 0, 1310749, 9, 0, 1310750, 9, 0, 1310751, 9, 0 )
 
 [node name="ActorMap" type="TileMap" parent="."]
 tile_set = ExtResource( 1 )
@@ -21,16 +23,46 @@ tile_data = PoolIntArray( 131074, 8, 0 )
 tile_set = ExtResource( 1 )
 cell_size = Vector2( 16, 16 )
 format = 1
-tile_data = PoolIntArray( 196608, 9, 0 )
+tile_data = PoolIntArray( 196608, 9, 0, 196609, 12, 0, 196613, 14, 0, 262145, 14, 0, 327683, 13, 0 )
 
 [node name="GameLogic" type="Node" parent="."]
 script = ExtResource( 2 )
 
 [node name="HeroInfo" type="Label" parent="."]
-margin_left = 83.0
+margin_left = 517.0
 margin_top = 1.0
-margin_right = 206.0
+margin_right = 640.0
 margin_bottom = 109.0
 custom_colors/font_color = Color( 0.988235, 0.921569, 0.713726, 1 )
-text = "lorem
-ipsum"
+text = "HP: 9999
+ATK: 999
+DEF: 999
+Turn: 9999 (9999)
+You have... ?"
+autowrap = true
+
+[node name="LastMessage" type="Label" parent="."]
+margin_top = 345.0
+margin_right = 641.0
+margin_bottom = 359.0
+custom_colors/font_color = Color( 0.988235, 0.921569, 0.713726, 1 )
+text = "dummy text"
+
+[node name="HoverInfo" type="Label" parent="."]
+margin_left = 515.0
+margin_top = 140.0
+margin_right = 638.0
+margin_bottom = 328.0
+custom_colors/font_color = Color( 0.988235, 0.921569, 0.713726, 1 )
+text = "Thing
+
+This is a thing."
+autowrap = true
+
+[node name="HoverSprite" type="Sprite" parent="."]
+position = Vector2( 527, 128 )
+texture = ExtResource( 3 )
+
+[node name="HoverSprite2" type="Sprite" parent="."]
+position = Vector2( 527, 128 )
+texture = ExtResource( 4 )

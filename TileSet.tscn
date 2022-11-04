@@ -184,10 +184,6 @@ texture = ExtResource( 37 )
 position = Vector2( 146, 125 )
 texture = ExtResource( 32 )
 
-[node name="Player2" type="Sprite" parent="."]
-position = Vector2( 146, 125 )
-texture = ExtResource( 2 )
-
 [node name="Warpwings" type="Sprite" parent="."]
 position = Vector2( 146, 125 )
 texture = ExtResource( 34 )
