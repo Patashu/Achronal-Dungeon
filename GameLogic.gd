@@ -83,14 +83,23 @@ func move_hero(dir: Vector2) -> bool:
 	if (dest_loc.x < 0 || dest_loc.x > map_x_max || dest_loc.y < 0 || dest_loc.y > map_y_max):
 		print_message("Space and time don't exist out of bounds, sorry.")
 		return false;
-	if (floor_dest == floormap.tile_set.find_tile_by_name("Wall") || floor_dest ==  floormap.tile_set.find_tile_by_name("Greenwall")):
-		# TODO: pickaxe check
-		print_message("You bump into the wall.");
-		can_move = false;
+	if ("wall" in dest_name):
+		if (pickaxes > 0):
+			print_message("You dig through the wall.");
+			var is_green = "green" in dest_name;
+			add_undo_event(["gain_pickaxe", -1], false);
+			pickaxes -= 1;
+			add_undo_event(["destroy", dest_loc, dest_name, multiplier_val], is_green);
+			floormap.set_cellv(dest_loc, -1);
+			multipliermap.set_cellv(dest_loc, -1);
+			can_move = true;
+		else:
+			print_message("You bump into the wall.");
+			can_move = false;
 	# empty tile's fine to move into
 	if (actor_dest == -1 && floor_dest == -1):
 		can_move = true;
-	if ("potion" in dest_name) or ("sword" in dest_name) or ("shield" in dest_name):
+	if ("potion" in dest_name) or ("sword" in dest_name) or ("shield" in dest_name) or ("pickaxe" in dest_name):
 		can_move = true;
 		consume_item(dest_loc);
 	if ("enemy" in dest_name):
@@ -101,7 +110,7 @@ func move_hero(dir: Vector2) -> bool:
 		else:
 			can_move = true;
 			consume_item(dest_loc);
-	if ("win" in dest_name):
+	if ("Win" == dest_name):
 		can_move = true;
 		win();
 	if (can_move):
@@ -137,6 +146,10 @@ func consume_item(dest_loc: Vector2) -> void:
 		add_undo_event(["gain_def", multiplier_val], is_green);
 		hero_def += multiplier_val;
 		message = "You take the " + name_thing(dest_name, multiplier_val) + " and gain " + str(multiplier_val) + " DEF!";
+	elif ("pickaxe" in dest_name):
+		add_undo_event(["gain_pickaxe", multiplier_val], is_green);
+		pickaxes += multiplier_val;
+		message = "You take the " + name_thing(dest_name, multiplier_val) + "! Bump wall to use.";
 	elif ("enemy" in dest_name):
 		# only come here if we can win the fight
 		var enemy_stats = monster_helper(dest_name, multiplier_val);
@@ -220,6 +233,8 @@ func undo_one_event(event: Array) -> void:
 		hero_atk -= event[1];
 	elif (event[0] == "gain_def"):
 		hero_def -= event[1];
+	elif (event[0] == "gain_pickaxe"):
+		pickaxes -= event[1];
 
 func update_hover_info() -> void:
 	var dest_loc = floormap.world_to_map(get_viewport().get_mouse_position());
