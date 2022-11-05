@@ -1,29 +1,33 @@
 extends Node
 class_name GameLogic
 
-onready var multipliermap = get_node("/root/PlayingField/MultiplierMap");
-onready var actormap = get_node("/root/PlayingField/ActorMap");
-onready var floormap = get_node("/root/PlayingField/FloorMap");
-onready var heroinfo = get_node("/root/PlayingField/HeroInfo");
-onready var lastmessage = get_node("/root/PlayingField/LastMessage");
-onready var hoverinfo = get_node("/root/PlayingField/HoverInfo");
-onready var hoversprite = get_node("/root/PlayingField/HoverSprite");
-onready var hoversprite2 = get_node("/root/PlayingField/HoverSprite2");
-var hero_loc = Vector2.ZERO;
-var hero_hp = 100;
-var hero_atk = 1;
-var hero_def = 0;
-var hero_turn = 0;
-var hero_keypresses = 0;
-var has_won = false;
-var undo_buffer = [];
-var meta_undo_buffer = [];
-var greenality_max = 0;
-var greenality_avail = 0;
-var pickaxes = 0;
-var warpwings = 0;
-var green_tutorial_message_seen = false;
-var greenality_tutorial_message_seen = false;
+onready var multipliermap : TileMap = get_node("/root/PlayingField/MultiplierMap");
+onready var actormap : TileMap = get_node("/root/PlayingField/ActorMap");
+onready var floormap : TileMap = get_node("/root/PlayingField/FloorMap");
+onready var inventorymap : TileMap = get_node("/root/PlayingField/InventoryMap");
+onready var heroinfo : Label = get_node("/root/PlayingField/HeroInfo");
+onready var lastmessage : Label = get_node("/root/PlayingField/LastMessage");
+onready var hoverinfo : Label = get_node("/root/PlayingField/HoverInfo");
+onready var hoversprite : Sprite = get_node("/root/PlayingField/HoverSprite");
+onready var hoversprite2 : Sprite = get_node("/root/PlayingField/HoverSprite2");
+var hero_loc : Vector2 = Vector2.ZERO;
+var hero_hp : int = 100;
+var hero_atk : int = 1;
+var hero_def : int = 0;
+var hero_turn : int = 0;
+var hero_keypresses : int = 0;
+var has_won : bool = false;
+var undo_buffer : Array = [];
+var meta_undo_buffer : Array = [];
+var greenality_max : int = 0;
+var greenality_avail : int = 0;
+var pickaxes : int = 0;
+var warpwings : int = 0;
+var green_tutorial_message_seen : bool = false;
+var greenality_tutorial_message_seen : bool = false;
+var inventory_width : int = 7;
+var map_x_max : int = 31;
+var map_y_max : int = 20;
 
 func _ready() -> void:
 	# setup hero info
@@ -41,8 +45,23 @@ func update_hero_info() -> void:
 		heroinfo.text += "Turn: " + str(hero_turn) + " (" + str(hero_keypresses) + ")" + "\r\n";
 	else:
 		heroinfo.text += "Turn: " + str(hero_turn) + "\r\n";
-	if (has_won):
-		heroinfo.text += "You have won!";
+	update_inventory();
+	
+func update_inventory() -> void:
+	inventorymap.clear();
+	var i = 0;
+	for k in range(pickaxes):
+		inventorymap.set_cellv(Vector2(i % inventory_width, floor(i / inventory_width)),
+		inventorymap.tile_set.find_tile_by_name("Pickaxe"));
+		i += 1;
+	for k in range(warpwings):
+		inventorymap.set_cellv(Vector2(i % inventory_width, floor(i / inventory_width)),
+		inventorymap.tile_set.find_tile_by_name("Warpwings"));
+		i += 1;
+	for k in range(greenality_avail):
+		inventorymap.set_cellv(Vector2(i % inventory_width, floor(i / inventory_width)),
+		inventorymap.tile_set.find_tile_by_name("Greenality"));
+		i += 1;
 
 func move_hero(dir: Vector2) -> bool:
 	# check multiplier, actor and floor at destination
@@ -61,7 +80,7 @@ func move_hero(dir: Vector2) -> bool:
 	if (dest_to_use > -1):
 		dest_name = floormap.tile_set.tile_get_name(dest_to_use).to_lower();
 	# no going out of bounds, please
-	if (dest_loc.x < 0 || dest_loc.x > 31 || dest_loc.y < 0 || dest_loc.y > 20):
+	if (dest_loc.x < 0 || dest_loc.x > map_x_max || dest_loc.y < 0 || dest_loc.y > map_y_max):
 		print_message("Space and time don't exist out of bounds, sorry.")
 		return false;
 	if (floor_dest == floormap.tile_set.find_tile_by_name("Wall") || floor_dest ==  floormap.tile_set.find_tile_by_name("Greenwall")):
@@ -90,7 +109,9 @@ func move_hero(dir: Vector2) -> bool:
 	return can_move;
 		
 func win() -> void:
-	# TODO: change this into a print message function and determine ending type
+	# TODO: ending type check
+	var message = "You have won! Undo, restart or meta-restart to continue playing."
+	print_message(message)
 	has_won = true;
 	add_undo_event(["win"]);
 		

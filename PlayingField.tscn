@@ -32,13 +32,12 @@ script = ExtResource( 2 )
 margin_left = 517.0
 margin_top = 1.0
 margin_right = 640.0
-margin_bottom = 109.0
+margin_bottom = 66.0
 custom_colors/font_color = Color( 0.988235, 0.921569, 0.713726, 1 )
 text = "HP: 9999
 ATK: 999
 DEF: 999
-Turn: 9999 (9999)
-You have... ?"
+Turn: 9999 (9999)"
 autowrap = true
 
 [node name="LastMessage" type="Label" parent="."]
@@ -66,3 +65,9 @@ texture = ExtResource( 3 )
 [node name="HoverSprite2" type="Sprite" parent="."]
 position = Vector2( 527, 128 )
 texture = ExtResource( 4 )
+
+[node name="InventoryMap" type="TileMap" parent="."]
+position = Vector2( 520, 70 )
+tile_set = ExtResource( 1 )
+cell_size = Vector2( 16, 16 )
+format = 1
