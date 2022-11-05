@@ -8,7 +8,7 @@
 [ext_resource path="res://assets/bluesword.png" type="Texture" id=6]
 [ext_resource path="res://assets/win.png" type="Texture" id=7]
 [ext_resource path="res://assets/blueshield.png" type="Texture" id=8]
-[ext_resource path="res://assets/enemy1.png" type="Texture" id=9]
+[ext_resource path="res://assets/enemyguard.png" type="Texture" id=9]
 [ext_resource path="res://assets/greenshield.png" type="Texture" id=10]
 [ext_resource path="res://assets/greenpotion.png" type="Texture" id=11]
 [ext_resource path="res://assets/2000.png" type="Texture" id=12]
@@ -32,7 +32,7 @@
 [ext_resource path="res://assets/greenenemyfire.png" type="Texture" id=30]
 [ext_resource path="res://assets/greenplayer.png" type="Texture" id=31]
 [ext_resource path="res://assets/pickaxe.png" type="Texture" id=32]
-[ext_resource path="res://assets/greenenemy1.png" type="Texture" id=33]
+[ext_resource path="res://assets/greenenemyguard.png" type="Texture" id=33]
 [ext_resource path="res://assets/warpwings.png" type="Texture" id=34]
 [ext_resource path="res://assets/greenwarpwings.png" type="Texture" id=35]
 [ext_resource path="res://assets/greenenemyslime.png" type="Texture" id=36]
@@ -52,7 +52,7 @@ texture = ExtResource( 8 )
 position = Vector2( -86, 94 )
 texture = ExtResource( 6 )
 
-[node name="Enemy1" type="Sprite" parent="."]
+[node name="Enemyguard" type="Sprite" parent="."]
 position = Vector2( -86, 94 )
 texture = ExtResource( 9 )
 
@@ -144,7 +144,7 @@ texture = ExtResource( 24 )
 position = Vector2( 14, 103 )
 texture = ExtResource( 25 )
 
-[node name="Greenenemy1" type="Sprite" parent="."]
+[node name="Greenenemyguard" type="Sprite" parent="."]
 position = Vector2( 65, 111 )
 texture = ExtResource( 33 )
 

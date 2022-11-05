@@ -44,7 +44,7 @@ func update_hero_info() -> void:
 	if (has_won):
 		heroinfo.text += "You have won!";
 
-func move_hero(dir: Vector2) -> void:
+func move_hero(dir: Vector2) -> bool:
 	# check multiplier, actor and floor at destination
 	# note: for now I'm putting only the player in the actor layer...
 	# and ONLY because the player might overlap things (most notably the goal)
@@ -52,6 +52,7 @@ func move_hero(dir: Vector2) -> void:
 	var multiplier_dest = multipliermap.get_cellv(dest_loc);
 	var actor_dest = actormap.get_cellv(dest_loc);
 	var floor_dest = floormap.get_cellv(dest_loc);
+	var multiplier_val = multiplier_id_to_number(multiplier_dest);
 	var can_move = false;
 	var dest_to_use = actor_dest;
 	if (dest_to_use == -1):
@@ -62,7 +63,7 @@ func move_hero(dir: Vector2) -> void:
 	# no going out of bounds, please
 	if (dest_loc.x < 0 || dest_loc.x > 31 || dest_loc.y < 0 || dest_loc.y > 20):
 		print_message("Space and time don't exist out of bounds, sorry.")
-		return;
+		return false;
 	if (floor_dest == floormap.tile_set.find_tile_by_name("Wall") || floor_dest ==  floormap.tile_set.find_tile_by_name("Greenwall")):
 		# TODO: pickaxe check
 		print_message("You bump into the wall.");
@@ -73,16 +74,29 @@ func move_hero(dir: Vector2) -> void:
 	if ("potion" in dest_name) or ("sword" in dest_name) or ("shield" in dest_name):
 		can_move = true;
 		consume_item(dest_loc);
+	if ("enemy" in dest_name):
+		var enemy_stats = monster_helper(dest_name, multiplier_val);
+		if (enemy_stats[2] > hero_hp):
+			can_move = false;
+			print_message("Fighting this " + name_thing(dest_name, multiplier_val) + " costs " + str(enemy_stats[2]) + " HP.");
+		else:
+			can_move = true;
+			consume_item(dest_loc);
 	if ("win" in dest_name):
 		can_move = true;
-		has_won = true;
-		add_undo_event(["win"]);
+		win();
 	if (can_move):
 		move_hero_commit(dir);
+	return can_move;
+		
+func win() -> void:
+	# TODO: change this into a print message function and determine ending type
+	has_won = true;
+	add_undo_event(["win"]);
 		
 func consume_item(dest_loc: Vector2) -> void:
 	var multiplier_dest = multipliermap.get_cellv(dest_loc);
-	var multiplier_val = multiplier_id_to_number(multiplier_dest)
+	var multiplier_val = multiplier_id_to_number(multiplier_dest);
 	var dest_to_use = floormap.get_cellv(dest_loc);
 	var dest_name = floormap.tile_set.tile_get_name(dest_to_use).to_lower();
 	var is_green = "green" in dest_name;
@@ -94,15 +108,22 @@ func consume_item(dest_loc: Vector2) -> void:
 		add_undo_event(["gain_hp", multiplier_val], is_green);
 		hero_hp += multiplier_val;
 		message = "You drink the " + name_thing(dest_name, multiplier_val) + " and gain " + str(multiplier_val) + " HP!";
-	if ("sword" in dest_name):
+	elif ("sword" in dest_name):
 		add_undo_event(["gain_atk", multiplier_val], is_green);
 		hero_atk += multiplier_val;
 		message = "You take the " + name_thing(dest_name, multiplier_val) + " and gain " + str(multiplier_val) + " ATK!";
-	if ("shield" in dest_name):
+	elif ("shield" in dest_name):
 		add_undo_event(["gain_def", multiplier_val], is_green);
 		hero_def += multiplier_val;
 		message = "You take the " + name_thing(dest_name, multiplier_val) + " and gain " + str(multiplier_val) + " DEF!";
-	if (!green_tutorial_message_seen):
+	elif ("enemy" in dest_name):
+		# only come here if we can win the fight
+		var enemy_stats = monster_helper(dest_name, multiplier_val);
+		# the wounds from fighting a green monster are NOT green
+		add_undo_event(["gain_hp", -enemy_stats[2]], false);
+		hero_hp -= enemy_stats[2];
+		message = "You kill the " + name_thing(dest_name, multiplier_val) + ", losing " + str(enemy_stats[2]) + " HP.";
+	if (is_green and !green_tutorial_message_seen):
 		green_tutorial_message_seen = true;
 		message += " GREEN changes persist through undo (z) and restart (r)."
 		pass
@@ -270,7 +291,7 @@ func name_thing(dest_name: String, multiplier_val: int) -> String:
 	if ("shield" in dest_name):
 		result += "Shield";
 		
-	if ("enemy1" in dest_name):
+	if ("guard" in dest_name):
 		result += "Guard";
 		
 	if ("fire" in dest_name):
@@ -307,7 +328,7 @@ func monster_helper(name: String, multiplier_val: int) -> Array:
 	if "slime" in name:
 		result[0] = 10*multiplier_val;
 		result[1] = 1*multiplier_val;
-	elif "enemy1" in name:
+	elif "guard" in name:
 		result[0] = 5*multiplier_val;
 		result[1] = 2*multiplier_val;
 	elif "teeth" in name:
