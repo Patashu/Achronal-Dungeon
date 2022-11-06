@@ -23,6 +23,7 @@ var greenality_max : int = 0;
 var greenality_avail : int = 0;
 var pickaxes : int = 0;
 var warpwings : int = 0;
+var keys : int = 0;
 var green_tutorial_message_seen : bool = false;
 var greenality_tutorial_message_seen : bool = false;
 var inventory_width : int = 7;
@@ -60,6 +61,10 @@ func update_hero_info() -> void:
 func update_inventory() -> void:
 	inventorymap.clear();
 	var i = 0;
+	for k in range(keys):
+		inventorymap.set_cellv(Vector2(i % inventory_width, floor(i / inventory_width)),
+		inventorymap.tile_set.find_tile_by_name("Key"));
+		i += 1;
 	for k in range(pickaxes):
 		inventorymap.set_cellv(Vector2(i % inventory_width, floor(i / inventory_width)),
 		inventorymap.tile_set.find_tile_by_name("Pickaxe"));
@@ -106,10 +111,23 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 		else:
 			print_message("You bump into the wall.");
 			can_move = false;
+	if ("lock" in dest_name):
+		if (keys > 0):
+			print_message("You open the lock.");
+			var is_green = "green" in dest_name;
+			add_undo_event(["gain_key", -1], false);
+			keys-= 1;
+			add_undo_event(["destroy", dest_loc, dest_name, multiplier_val], is_green);
+			floormap.set_cellv(dest_loc, -1);
+			multipliermap.set_cellv(dest_loc, -1);
+			can_move = true;
+		else:
+			print_message("You need a key to open this lock.");
+			can_move = false;
 	# empty tile's fine to move into
 	if (actor_dest == -1 && floor_dest == -1):
 		can_move = true;
-	if ("potion" in dest_name) or ("sword" in dest_name) or ("shield" in dest_name) or ("pickaxe" in dest_name) or ("warpwings" in dest_name):
+	if ("potion" in dest_name) or ("sword" in dest_name) or ("shield" in dest_name) or ("pickaxe" in dest_name) or ("warpwings" in dest_name) or ("key" in dest_name):
 		can_move = true;
 		consume_item(dest_loc);
 	if ("enemy" in dest_name):
@@ -168,6 +186,10 @@ func consume_item(dest_loc: Vector2) -> void:
 		add_undo_event(["gain_warpwings", multiplier_val], is_green);
 		warpwings += multiplier_val;
 		message = "You take the " + name_thing(dest_name, multiplier_val) + "! X to use.";
+	elif ("key" in dest_name):
+		add_undo_event(["gain_key", multiplier_val], is_green);
+		keys += multiplier_val;
+		message = "You take the " + name_thing(dest_name, multiplier_val) + "! Bump lock to use.";
 	elif ("enemy" in dest_name):
 		# only come here if we can win the fight
 		var enemy_stats = monster_helper(dest_name, multiplier_val);
@@ -266,6 +288,8 @@ func undo_one_event(event: Array) -> void:
 		pickaxes -= event[1];
 	elif (event[0] == "gain_warpwings"):
 		warpwings -= event[1];
+	elif (event[0] == "gain_key"):
+		keys -= event[1];
 
 func update_hover_info() -> void:
 	var dest_loc = floormap.world_to_map(get_viewport().get_mouse_position());
@@ -330,6 +354,12 @@ func update_hover_info() -> void:
 		
 	if ("magicmirror" in dest_name):
 		hoverinfo.text += "\nYou can see your reflection in this!";
+		
+	if ("key" in dest_name):
+		hoverinfo.text += "\nAllows you to open one lock.";
+		
+	if ("lock" in dest_name):
+		hoverinfo.text += "\nTakes one key to open.";
 	
 	if (("green" in dest_name) and not ("greenality" in dest_name)):
 		add_green_reminder();
@@ -381,6 +411,12 @@ func name_thing(dest_name: String, multiplier_val: int) -> String:
 		
 	if ("magicmirror" in dest_name):
 		result += "Magic Mirror";
+		
+	if ("key" in dest_name):
+		result += "Key";
+		
+	if ("lock" in dest_name):
+		result += "Lock";
 	
 	if (multiplier_val > 1):
 		result += "(x" + str(multiplier_val) + ")"

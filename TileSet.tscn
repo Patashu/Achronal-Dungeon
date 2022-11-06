@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=2]
+[gd_scene load_steps=42 format=2]
 
 [ext_resource path="res://assets/greensword.png" type="Texture" id=1]
 [ext_resource path="res://assets/player.png" type="Texture" id=2]
@@ -37,6 +37,10 @@
 [ext_resource path="res://assets/greenwarpwings.png" type="Texture" id=35]
 [ext_resource path="res://assets/greenenemyslime.png" type="Texture" id=36]
 [ext_resource path="res://assets/magicmirror.png" type="Texture" id=37]
+[ext_resource path="res://assets/greenlock.png" type="Texture" id=38]
+[ext_resource path="res://assets/greenkey.png" type="Texture" id=39]
+[ext_resource path="res://assets/lock.png" type="Texture" id=40]
+[ext_resource path="res://assets/key.png" type="Texture" id=41]
 
 [node name="TileSet" type="Node2D"]
 
@@ -187,3 +191,19 @@ texture = ExtResource( 32 )
 [node name="Warpwings" type="Sprite" parent="."]
 position = Vector2( 146, 125 )
 texture = ExtResource( 34 )
+
+[node name="Key" type="Sprite" parent="."]
+position = Vector2( 46, 159 )
+texture = ExtResource( 41 )
+
+[node name="Lock" type="Sprite" parent="."]
+position = Vector2( 46, 159 )
+texture = ExtResource( 40 )
+
+[node name="Greenkey" type="Sprite" parent="."]
+position = Vector2( 80, 183 )
+texture = ExtResource( 39 )
+
+[node name="Greenlock" type="Sprite" parent="."]
+position = Vector2( 80, 183 )
+texture = ExtResource( 38 )

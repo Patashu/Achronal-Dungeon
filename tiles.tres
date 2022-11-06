@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=40 format=2]
+[gd_resource type="TileSet" load_steps=44 format=2]
 
 [ext_resource path="res://assets/greensword.png" type="Texture" id=1]
 [ext_resource path="res://assets/player.png" type="Texture" id=2]
@@ -37,6 +37,10 @@
 [ext_resource path="res://assets/greenwarpwings.png" type="Texture" id=35]
 [ext_resource path="res://assets/greenenemyslime.png" type="Texture" id=36]
 [ext_resource path="res://assets/magicmirror.png" type="Texture" id=37]
+[ext_resource path="res://assets/greenlock.png" type="Texture" id=38]
+[ext_resource path="res://assets/greenkey.png" type="Texture" id=39]
+[ext_resource path="res://assets/lock.png" type="Texture" id=40]
+[ext_resource path="res://assets/key.png" type="Texture" id=41]
 
 [sub_resource type="StreamTexture" id=1]
 load_path = "res://.import/greenenemy1.png-6d7a8a94da959bbf6882dec6cf83679d.stex"
@@ -605,3 +609,59 @@ load_path = "res://.import/enemy1.png-80e7833e7dadb618c6e96dc2c7230e09.stex"
 39/shape_one_way_margin = 0.0
 39/shapes = [  ]
 39/z_index = 0
+40/name = "Key"
+40/texture = ExtResource( 41 )
+40/tex_offset = Vector2( 0, 0 )
+40/modulate = Color( 1, 1, 1, 1 )
+40/region = Rect2( 0, 0, 16, 16 )
+40/tile_mode = 0
+40/occluder_offset = Vector2( 8, 8 )
+40/navigation_offset = Vector2( 8, 8 )
+40/shape_offset = Vector2( 0, 0 )
+40/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+40/shape_one_way = false
+40/shape_one_way_margin = 0.0
+40/shapes = [  ]
+40/z_index = 0
+41/name = "Lock"
+41/texture = ExtResource( 40 )
+41/tex_offset = Vector2( 0, 0 )
+41/modulate = Color( 1, 1, 1, 1 )
+41/region = Rect2( 0, 0, 16, 16 )
+41/tile_mode = 0
+41/occluder_offset = Vector2( 8, 8 )
+41/navigation_offset = Vector2( 8, 8 )
+41/shape_offset = Vector2( 0, 0 )
+41/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+41/shape_one_way = false
+41/shape_one_way_margin = 0.0
+41/shapes = [  ]
+41/z_index = 0
+42/name = "Greenkey"
+42/texture = ExtResource( 39 )
+42/tex_offset = Vector2( 0, 0 )
+42/modulate = Color( 1, 1, 1, 1 )
+42/region = Rect2( 0, 0, 16, 16 )
+42/tile_mode = 0
+42/occluder_offset = Vector2( 8, 8 )
+42/navigation_offset = Vector2( 8, 8 )
+42/shape_offset = Vector2( 0, 0 )
+42/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+42/shape_one_way = false
+42/shape_one_way_margin = 0.0
+42/shapes = [  ]
+42/z_index = 0
+43/name = "Greenlock"
+43/texture = ExtResource( 38 )
+43/tex_offset = Vector2( 0, 0 )
+43/modulate = Color( 1, 1, 1, 1 )
+43/region = Rect2( 0, 0, 16, 16 )
+43/tile_mode = 0
+43/occluder_offset = Vector2( 8, 8 )
+43/navigation_offset = Vector2( 8, 8 )
+43/shape_offset = Vector2( 0, 0 )
+43/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+43/shape_one_way = false
+43/shape_one_way_margin = 0.0
+43/shapes = [  ]
+43/z_index = 0
