@@ -11,9 +11,13 @@ onready var hoverinfo : Label = get_node("/root/PlayingField/HoverInfo");
 onready var hoversprite : Sprite = get_node("/root/PlayingField/HoverSprite");
 onready var hoversprite2 : Sprite = get_node("/root/PlayingField/HoverSprite2");
 var hero_loc : Vector2 = Vector2.ZERO;
+var hero_loc_start : Vector2 = Vector2.ZERO;
 var hero_hp : int = 100;
+var hero_hp_start : int = 100;
 var hero_atk : int = 1;
+var hero_atk_start : int = 1;
 var hero_def : int = 0;
+var hero_def_start : int = 0;
 var hero_turn : int = 0;
 var hero_keypresses : int = 0;
 var has_won : bool = false;
@@ -31,12 +35,14 @@ var map_x_max : int = 0; # 31
 var map_y_max : int = 0; # 20
 var action_primed = false;
 var greenality_timer = 0;
+var green_hero = false;
 
 func _ready() -> void:
 	# setup hero info
 	var hero_id = actormap.tile_set.find_tile_by_name("Player");
 	var hero_tile = actormap.get_used_cells_by_id(hero_id)[0];
 	hero_loc = hero_tile;
+	hero_loc_start = hero_loc;
 	update_hero_info();
 	calculate_map_size();
 	print_message("Welcome to the Achronal Dungeon! wasd/arrows to move, z to undo, r to restart, mouse to inspect.")
@@ -231,11 +237,14 @@ func move_hero_commit(dir: Vector2) -> void:
 	update_hero_info();
 
 func move_hero_silently(dir: Vector2) -> void:
+	var id = actormap.get_cellv(hero_loc);
 	actormap.set_cellv(hero_loc, -1);
 	hero_loc += dir;
-	actormap.set_cellv(hero_loc, actormap.tile_set.find_tile_by_name("Player"));
+	actormap.set_cellv(hero_loc, id);
 
 func try_warp_wings() -> void:
+	if (warpwings <= 0):
+		return;
 	# the formula is basically, mirror across the x axis, then mirror across the y axis.
 	# 0 1 2 3 -> 0 becomes 3, 1 becomes 2
 	# 0 1 2 3 4 -> 0 becomes 4, 1 becomes 3, 2 becomes 2
@@ -244,6 +253,8 @@ func try_warp_wings() -> void:
 	move_hero(dir, true);
 
 func try_greenality(dir: Vector2) -> void:
+	if (greenality_avail <= 0):
+		return;
 	var dest_loc = hero_loc + dir;
 	var multiplier_dest = multipliermap.get_cellv(dest_loc);
 	var actor_dest = actormap.get_cellv(dest_loc);
@@ -273,7 +284,16 @@ func try_greenality(dir: Vector2) -> void:
 		return;
 	
 	if ("magicmirror" in dest_name):
-		print_message("TODO")
+		print_message("The GREEN bounces off the Magic Mirror and affects you!")
+		add_undo_event(["dummy"], false);
+		add_undo_event(["green_player"], true);
+		actormap.set_cellv(hero_loc, actormap.tile_set.find_tile_by_name("Greenplayer"));
+		green_hero = true;
+		greenality_timer += 1;
+		greenality_avail -= 1;
+		hero_turn += 1;
+		hero_keypresses += 1;
+		update_hero_info();
 		return;
 		
 	if ("win" == dest_name):
@@ -309,6 +329,11 @@ func meta_restart() -> void:
 	for event in meta_undo_buffer:
 		undo_one_event(event);
 	meta_undo_buffer = [];
+	# post green player fixups
+	move_hero_silently(hero_loc_start - hero_loc);
+	hero_hp = hero_hp_start;
+	hero_atk = hero_atk_start;
+	hero_def = hero_def_start;
 	hero_keypresses = 0;
 	greenality_avail = greenality_max;
 	update_hero_info();
@@ -332,7 +357,7 @@ func undo() -> void:
 	update_hero_info();
 
 func undo_one_event(event: Array) -> void:
-	if (event[0] == "move"):
+	if (event[0] == "move" and !green_hero):
 		move_hero_silently(event[1] - hero_loc);
 	elif (event[0] == "win"):
 		has_won = false;
@@ -350,11 +375,14 @@ func undo_one_event(event: Array) -> void:
 		var dest_name = floormap.tile_set.tile_get_name(dest_to_use).to_lower();
 		dest_name = dest_name.trim_prefix("green");
 		floormap.set_cellv(dest_loc, floormap.tile_set.find_tile_by_name(dest_name.capitalize()));
-	elif (event[0] == "gain_hp"):
+	elif (event[0] == "green_player"):
+		green_hero = false;
+		actormap.set_cellv(hero_loc, actormap.tile_set.find_tile_by_name("Player"));
+	elif (event[0] == "gain_hp" and !green_hero):
 		hero_hp -= event[1];
-	elif (event[0] == "gain_atk"):
+	elif (event[0] == "gain_atk" and !green_hero):
 		hero_atk -= event[1];
-	elif (event[0] == "gain_def"):
+	elif (event[0] == "gain_def" and !green_hero):
 		hero_def -= event[1];
 	elif (event[0] == "gain_pickaxe"):
 		pickaxes -= event[1];
