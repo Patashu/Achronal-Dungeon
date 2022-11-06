@@ -30,6 +30,7 @@ var inventory_width : int = 7;
 var map_x_max : int = 0; # 31
 var map_y_max : int = 0; # 20
 var action_primed = false;
+var greenality_timer = 0;
 
 func _ready() -> void:
 	# setup hero info
@@ -116,7 +117,7 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 			print_message("You open the lock.");
 			var is_green = "green" in dest_name;
 			add_undo_event(["gain_key", -1], false);
-			keys-= 1;
+			keys -= 1;
 			add_undo_event(["destroy", dest_loc, dest_name, multiplier_val], is_green);
 			floormap.set_cellv(dest_loc, -1);
 			multipliermap.set_cellv(dest_loc, -1);
@@ -124,12 +125,18 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 		else:
 			print_message("You need a key to open this lock.");
 			can_move = false;
+	if ("magicmirror" in dest_name):
+		print_message("You see your reflection in the mirror!")
+		can_move = false;
 	# empty tile's fine to move into
 	if (actor_dest == -1 && floor_dest == -1):
 		can_move = true;
 	if ("potion" in dest_name) or ("sword" in dest_name) or ("shield" in dest_name) or ("pickaxe" in dest_name) or ("warpwings" in dest_name) or ("key" in dest_name):
 		can_move = true;
 		consume_item(dest_loc);
+	if ("greenality" in dest_name):
+		can_move = true;
+		consume_greenality(dest_loc);
 	if ("enemy" in dest_name):
 		var enemy_stats = monster_helper(dest_name, multiplier_val);
 		if (enemy_stats[2] > hero_hp):
@@ -155,6 +162,19 @@ func win() -> void:
 	print_message(message)
 	has_won = true;
 	add_undo_event(["win"]);
+		
+func consume_greenality(dest_loc: Vector2) -> void:
+	var multiplier_dest = multipliermap.get_cellv(dest_loc);
+	var multiplier_val = multiplier_id_to_number(multiplier_dest);
+	var dest_to_use = floormap.get_cellv(dest_loc);
+	var dest_name = floormap.tile_set.tile_get_name(dest_to_use).to_lower();
+	# so meta it doesn't even make a meta undo event
+	floormap.set_cellv(dest_loc, -1);
+	multipliermap.set_cellv(dest_loc, -1);
+	greenality_avail += 1;
+	greenality_max += 1;
+	greenality_timer = 1;
+	print_message("Use X+dir to turn something GREEN forever. Meta restart with ESC to refund Greenalities.");
 		
 func consume_item(dest_loc: Vector2) -> void:
 	var multiplier_dest = multipliermap.get_cellv(dest_loc);
@@ -466,6 +486,8 @@ func multiplier_id_to_number(id: int) -> int:
 	return int(string_result);
 
 func _process(delta: float) -> void:
+	if (greenality_timer > 0):
+		greenality_timer -= delta;
 	update_hover_info();
 	if (Input.is_action_just_pressed("undo")):
 		undo();

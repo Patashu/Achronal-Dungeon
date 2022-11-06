@@ -1,11 +1,13 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://GameLogic.gd" type="Script" id=2]
 [ext_resource path="res://assets/player.png" type="Texture" id=3]
 [ext_resource path="res://assets/1.png" type="Texture" id=4]
+[ext_resource path="res://PlayingField.gd" type="Script" id=5]
 
 [node name="PlayingField" type="Node2D"]
+script = ExtResource( 5 )
 
 [node name="FloorMap" type="TileMap" parent="."]
 tile_set = ExtResource( 1 )
