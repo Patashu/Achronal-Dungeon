@@ -155,9 +155,9 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 		else:
 			can_move = true;
 			consume_item(dest_loc);
-	if ("Win" == dest_name):
+	if ("win" == dest_name):
 		can_move = true;
-		win();
+		win(dest_loc);
 	if (can_move):
 		if (warp):
 			add_undo_event(["gain_warpwings", -1], false);
@@ -166,9 +166,20 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 		move_hero_commit(dir);
 	return can_move;
 		
-func win() -> void:
-	# TODO: ending type check
-	var message = "You have won! Undo, restart or meta-restart to continue playing."
+func win(dest_loc: Vector2) -> void:
+	var west = floormap.get_cellv(dest_loc + Vector2.LEFT);
+	var north = floormap.get_cellv(dest_loc + Vector2.UP);
+	var south = floormap.get_cellv(dest_loc + Vector2.DOWN);
+	var message = "You have won! "
+	if (green_hero):
+		message += "GREEN ENDING."
+	elif west == -1:
+		message += "HEROIC ENDING."
+	elif north == -1 or south == -1:
+		message += "TUNNEL ENDING."
+	else:
+		message += "ASCENT ENDING."
+	message += " (There are 4 endings.) Undo, restart or meta-restart to continue playing."
 	print_message(message)
 	has_won = true;
 	add_undo_event(["win"]);
