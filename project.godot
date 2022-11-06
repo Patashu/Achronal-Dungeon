@@ -26,11 +26,11 @@ config/icon="res://icon.png"
 
 [display]
 
-window/size/width=640
-window/size/height=360
+window/size/width=550
+window/size/height=350
 window/size/resizable=false
-window/size/test_width=1280
-window/size/test_height=720
+window/size/test_width=1100
+window/size/test_height=700
 window/stretch/mode="2d"
 
 [input]
