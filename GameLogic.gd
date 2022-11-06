@@ -26,8 +26,9 @@ var warpwings : int = 0;
 var green_tutorial_message_seen : bool = false;
 var greenality_tutorial_message_seen : bool = false;
 var inventory_width : int = 7;
-var map_x_max : int = 31;
-var map_y_max : int = 20;
+var map_x_max : int = 0; # 31
+var map_y_max : int = 0; # 20
+var action_primed = false;
 
 func _ready() -> void:
 	# setup hero info
@@ -35,7 +36,16 @@ func _ready() -> void:
 	var hero_tile = actormap.get_used_cells_by_id(hero_id)[0];
 	hero_loc = hero_tile;
 	update_hero_info();
+	calculate_map_size();
 	print_message("Welcome to the Achronal Dungeon! wasd/arrows to move, z to undo, r to restart, mouse to inspect.")
+
+func calculate_map_size() -> void:
+	var tiles = floormap.get_used_cells();
+	for tile in tiles:
+		if tile.x > map_x_max:
+			map_x_max = tile.x;
+		if tile.y > map_y_max:
+			map_y_max = tile.y;
 
 func update_hero_info() -> void:
 	heroinfo.text = "HP: " + str(hero_hp) + "\r\n";
@@ -63,7 +73,7 @@ func update_inventory() -> void:
 		inventorymap.tile_set.find_tile_by_name("Greenality"));
 		i += 1;
 
-func move_hero(dir: Vector2) -> bool:
+func move_hero(dir: Vector2, warp = false) -> bool:
 	# check multiplier, actor and floor at destination
 	# note: for now I'm putting only the player in the actor layer...
 	# and ONLY because the player might overlap things (most notably the goal)
@@ -99,7 +109,7 @@ func move_hero(dir: Vector2) -> bool:
 	# empty tile's fine to move into
 	if (actor_dest == -1 && floor_dest == -1):
 		can_move = true;
-	if ("potion" in dest_name) or ("sword" in dest_name) or ("shield" in dest_name) or ("pickaxe" in dest_name):
+	if ("potion" in dest_name) or ("sword" in dest_name) or ("shield" in dest_name) or ("pickaxe" in dest_name) or ("warpwings" in dest_name):
 		can_move = true;
 		consume_item(dest_loc);
 	if ("enemy" in dest_name):
@@ -114,6 +124,10 @@ func move_hero(dir: Vector2) -> bool:
 		can_move = true;
 		win();
 	if (can_move):
+		if (warp):
+			add_undo_event(["gain_warpwings", -1], false);
+			warpwings -= 1;
+			print_message("Warped!");
 		move_hero_commit(dir);
 	return can_move;
 		
@@ -150,6 +164,10 @@ func consume_item(dest_loc: Vector2) -> void:
 		add_undo_event(["gain_pickaxe", multiplier_val], is_green);
 		pickaxes += multiplier_val;
 		message = "You take the " + name_thing(dest_name, multiplier_val) + "! Bump wall to use.";
+	elif ("warpwings" in dest_name):
+		add_undo_event(["gain_warpwings", multiplier_val], is_green);
+		warpwings += multiplier_val;
+		message = "You take the " + name_thing(dest_name, multiplier_val) + "! X to use.";
 	elif ("enemy" in dest_name):
 		# only come here if we can win the fight
 		var enemy_stats = monster_helper(dest_name, multiplier_val);
@@ -174,6 +192,17 @@ func move_hero_silently(dir: Vector2) -> void:
 	actormap.set_cellv(hero_loc, -1);
 	hero_loc += dir;
 	actormap.set_cellv(hero_loc, actormap.tile_set.find_tile_by_name("Player"));
+
+func try_warp_wings() -> void:
+	# the formula is basically, mirror across the x axis, then mirror across the y axis.
+	# 0 1 2 3 -> 0 becomes 3, 1 becomes 2
+	# 0 1 2 3 4 -> 0 becomes 4, 1 becomes 3, 2 becomes 2
+	var dest_loc = Vector2(map_x_max - hero_loc.x, map_y_max - hero_loc.y);
+	var dir = dest_loc - hero_loc;
+	move_hero(dir, true);
+
+func try_greenality(dir: Vector2) -> void:
+	pass
 
 func add_undo_event(event: Array, is_green = false) -> void:
 	if (!is_green):
@@ -235,6 +264,8 @@ func undo_one_event(event: Array) -> void:
 		hero_def -= event[1];
 	elif (event[0] == "gain_pickaxe"):
 		pickaxes -= event[1];
+	elif (event[0] == "gain_warpwings"):
+		warpwings -= event[1];
 
 func update_hover_info() -> void:
 	var dest_loc = floormap.world_to_map(get_viewport().get_mouse_position());
@@ -408,11 +439,29 @@ func _process(delta: float) -> void:
 		meta_restart();
 	if (has_won):
 		return;
+		
+	if (Input.is_action_just_pressed("action")):
+		action_primed = true;
+	if (Input.is_action_just_released("action")):
+		if (action_primed):
+			try_warp_wings();
+			action_primed = false;
+		else:
+			pass
+			# user did a greenality
+	var dir = Vector2.ZERO;
 	if (Input.is_action_just_pressed("ui_left")):
-		move_hero(Vector2.LEFT);
+		dir = Vector2.LEFT;
 	if (Input.is_action_just_pressed("ui_right")):
-		move_hero(Vector2.RIGHT);
+		dir = Vector2.RIGHT;
 	if (Input.is_action_just_pressed("ui_up")):
-		move_hero(Vector2.UP);
+		dir = Vector2.UP;
 	if (Input.is_action_just_pressed("ui_down")):
-		move_hero(Vector2.DOWN);
+		dir = Vector2.DOWN;
+		
+	if dir != Vector2.ZERO:
+		if (action_primed):
+			try_greenality(dir);
+			action_primed = false;
+		else:
+			move_hero(dir);
