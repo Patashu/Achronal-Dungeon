@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=2]
+[gd_scene load_steps=43 format=2]
 
 [ext_resource path="res://assets/greensword.png" type="Texture" id=1]
 [ext_resource path="res://assets/player.png" type="Texture" id=2]
@@ -41,6 +41,7 @@
 [ext_resource path="res://assets/greenkey.png" type="Texture" id=39]
 [ext_resource path="res://assets/lock.png" type="Texture" id=40]
 [ext_resource path="res://assets/key.png" type="Texture" id=41]
+[ext_resource path="res://tiles.tres" type="TileSet" id=42]
 
 [node name="TileSet" type="Node2D"]
 
@@ -207,3 +208,8 @@ texture = ExtResource( 39 )
 [node name="Greenlock" type="Sprite" parent="."]
 position = Vector2( 80, 183 )
 texture = ExtResource( 38 )
+
+[node name="TileMap" type="TileMap" parent="."]
+tile_set = ExtResource( 42 )
+cell_size = Vector2( 16, 16 )
+format = 1
