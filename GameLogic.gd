@@ -36,6 +36,7 @@ var map_y_max : int = 0; # 20
 var action_primed = false;
 var greenality_timer = 0;
 var green_hero = false;
+var wallhack = false;
 
 func _ready() -> void:
 	# setup hero info
@@ -114,6 +115,9 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 			add_undo_event(["destroy", dest_loc, dest_name, multiplier_val], is_green);
 			floormap.set_cellv(dest_loc, -1);
 			multipliermap.set_cellv(dest_loc, -1);
+			can_move = true;
+		elif wallhack:
+			print_message("DEBUG: Wallhack is on.");
 			can_move = true;
 		else:
 			print_message("You bump into the wall.");
@@ -569,6 +573,9 @@ func _process(delta: float) -> void:
 	if (greenality_timer > 0):
 		greenality_timer -= delta;
 	update_hover_info();
+	if (Input.is_action_just_pressed("wallhack")):
+		print_message("DEBUG: Wallhack toggled.")
+		wallhack = !wallhack;
 	if (Input.is_action_just_pressed("undo")):
 		undo();
 	if (Input.is_action_just_pressed("restart")):
