@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/bluepotion.png-1b4eeec571eb05e6e8d940bb52e49e83.stex"
+path="res://.import/shield.png-46d74908b0ac118b50397d7021ae31f8.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/bluepotion.png"
-dest_files=[ "res://.import/bluepotion.png-1b4eeec571eb05e6e8d940bb52e49e83.stex" ]
+source_file="res://assets/shield.png"
+dest_files=[ "res://.import/shield.png-46d74908b0ac118b50397d7021ae31f8.stex" ]
 
 [params]
 

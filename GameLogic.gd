@@ -173,7 +173,7 @@ func consume_greenality(dest_loc: Vector2) -> void:
 	multipliermap.set_cellv(dest_loc, -1);
 	greenality_avail += 1;
 	greenality_max += 1;
-	greenality_timer = 1;
+	greenality_timer += 1;
 	print_message("Use X+dir to turn something GREEN forever. Meta restart with ESC to refund Greenalities.");
 		
 func consume_item(dest_loc: Vector2) -> void:
@@ -244,15 +244,60 @@ func try_warp_wings() -> void:
 	move_hero(dir, true);
 
 func try_greenality(dir: Vector2) -> void:
-	pass
+	var dest_loc = hero_loc + dir;
+	var multiplier_dest = multipliermap.get_cellv(dest_loc);
+	var actor_dest = actormap.get_cellv(dest_loc);
+	var floor_dest = floormap.get_cellv(dest_loc);
+	var multiplier_val = multiplier_id_to_number(multiplier_dest);
+	var can_move = false;
+	var dest_to_use = actor_dest;
+	if (dest_to_use == -1):
+		dest_to_use = floor_dest;
+	var dest_name = "";
+	if (dest_loc.x < 0 || dest_loc.x > map_x_max || dest_loc.y < 0 || dest_loc.y > map_y_max):
+		print_message("You can't make the infinite void GREEN.")
+		return;
+	if (dest_to_use > -1):
+		dest_name = floormap.tile_set.tile_get_name(dest_to_use).to_lower();
+	else:
+		print_message("You can't make the air GREEN.");
+		return;
+	
+	if ("greenality" in dest_name):
+		print_message("Sorry, that would tear a hole in spacetime, consuming you in the process.");
+		return;
+	
+	var is_green = "green" in dest_name;
+	if (is_green):
+		print_message("It's already as GREEN as it gets.");
+		return;
+	
+	if ("magicmirror" in dest_name):
+		print_message("TODO")
+		return;
+		
+	if ("win" == dest_name):
+		print_message("You can't make the Goal GREEN. (Good job taking a Greenality to it though!)")
+		return;
+	
+	# Everything else? Fair game, and should be the same code.
+	add_undo_event(["dummy"], false);
+	add_undo_event(["greenify", dest_loc], true);
+	floormap.set_cellv(dest_loc, floormap.tile_set.find_tile_by_name("Green" + dest_name));
+	greenality_timer += 0.5;
+	greenality_avail -= 1;
+	print_message("The " + name_thing(dest_name, multiplier_val) + " is now GREEN.");
+	hero_turn += 1;
+	hero_keypresses += 1;
+	update_hero_info();
 
 func add_undo_event(event: Array, is_green = false) -> void:
 	if (!is_green):
 		if (undo_buffer.size() <= hero_turn):
 			undo_buffer.append([]);
-		undo_buffer[hero_turn].append(event);
+		undo_buffer[hero_turn].push_front(event);
 	else:
-		meta_undo_buffer.append(event);
+		meta_undo_buffer.push_front(event);
 
 func print_message(message: String)-> void:
 	lastmessage.text = message;
@@ -298,6 +343,13 @@ func undo_one_event(event: Array) -> void:
 		floormap.set_cellv(dest_loc, floormap.tile_set.find_tile_by_name(dest_name.capitalize()));
 		if (multiplier_val > 1):
 			multipliermap.set_cellv(dest_loc, multipliermap.tile_set.find_tile_by_name(str(multiplier_val)));
+	elif (event[0] == "greenify"):
+		var dest_loc = event[1];
+		var floor_dest = floormap.get_cellv(dest_loc);
+		var dest_to_use = floor_dest;
+		var dest_name = floormap.tile_set.tile_get_name(dest_to_use).to_lower();
+		dest_name = dest_name.trim_prefix("green");
+		floormap.set_cellv(dest_loc, floormap.tile_set.find_tile_by_name(dest_name.capitalize()));
 	elif (event[0] == "gain_hp"):
 		hero_hp -= event[1];
 	elif (event[0] == "gain_atk"):

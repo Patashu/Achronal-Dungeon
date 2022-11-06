@@ -1,13 +1,13 @@
-[gd_resource type="TileSet" load_steps=44 format=2]
+[gd_resource type="TileSet" load_steps=47 format=2]
 
 [ext_resource path="res://assets/greensword.png" type="Texture" id=1]
 [ext_resource path="res://assets/player.png" type="Texture" id=2]
 [ext_resource path="res://assets/wall.png" type="Texture" id=3]
 [ext_resource path="res://assets/greenality.png" type="Texture" id=4]
-[ext_resource path="res://assets/bluepotion.png" type="Texture" id=5]
-[ext_resource path="res://assets/bluesword.png" type="Texture" id=6]
+[ext_resource path="res://assets/potion.png" type="Texture" id=5]
+[ext_resource path="res://assets/shield.png" type="Texture" id=6]
 [ext_resource path="res://assets/win.png" type="Texture" id=7]
-[ext_resource path="res://assets/blueshield.png" type="Texture" id=8]
+[ext_resource path="res://assets/sword.png" type="Texture" id=8]
 [ext_resource path="res://assets/greenenemyguard.png" type="Texture" id=9]
 [ext_resource path="res://assets/greenshield.png" type="Texture" id=10]
 [ext_resource path="res://assets/greenpotion.png" type="Texture" id=11]
@@ -42,6 +42,15 @@
 [ext_resource path="res://assets/lock.png" type="Texture" id=40]
 [ext_resource path="res://assets/key.png" type="Texture" id=41]
 
+[sub_resource type="StreamTexture" id=3]
+load_path = "res://.import/bluepotion.png-1b4eeec571eb05e6e8d940bb52e49e83.stex"
+
+[sub_resource type="StreamTexture" id=4]
+load_path = "res://.import/blueshield.png-ae9cef124f300fefae987690d425359d.stex"
+
+[sub_resource type="StreamTexture" id=5]
+load_path = "res://.import/bluesword.png-00ad8d1f8083272b07272f22de5ed646.stex"
+
 [sub_resource type="StreamTexture" id=1]
 load_path = "res://.import/greenenemy1.png-6d7a8a94da959bbf6882dec6cf83679d.stex"
 
@@ -50,7 +59,7 @@ load_path = "res://.import/enemy1.png-80e7833e7dadb618c6e96dc2c7230e09.stex"
 
 [resource]
 0/name = "Bluepotion"
-0/texture = ExtResource( 5 )
+0/texture = SubResource( 3 )
 0/tex_offset = Vector2( 0, 0 )
 0/modulate = Color( 1, 1, 1, 1 )
 0/region = Rect2( 0, 0, 16, 16 )
@@ -64,7 +73,7 @@ load_path = "res://.import/enemy1.png-80e7833e7dadb618c6e96dc2c7230e09.stex"
 0/shapes = [  ]
 0/z_index = 0
 1/name = "Blueshield"
-1/texture = ExtResource( 8 )
+1/texture = SubResource( 4 )
 1/tex_offset = Vector2( 0, 0 )
 1/modulate = Color( 1, 1, 1, 1 )
 1/region = Rect2( 0, 0, 16, 16 )
@@ -78,7 +87,7 @@ load_path = "res://.import/enemy1.png-80e7833e7dadb618c6e96dc2c7230e09.stex"
 1/shapes = [  ]
 1/z_index = 0
 2/name = "Bluesword"
-2/texture = ExtResource( 6 )
+2/texture = SubResource( 5 )
 2/tex_offset = Vector2( 0, 0 )
 2/modulate = Color( 1, 1, 1, 1 )
 2/region = Rect2( 0, 0, 16, 16 )
@@ -665,3 +674,45 @@ load_path = "res://.import/enemy1.png-80e7833e7dadb618c6e96dc2c7230e09.stex"
 43/shape_one_way_margin = 0.0
 43/shapes = [  ]
 43/z_index = 0
+44/name = "Potion"
+44/texture = ExtResource( 5 )
+44/tex_offset = Vector2( 0, 0 )
+44/modulate = Color( 1, 1, 1, 1 )
+44/region = Rect2( 0, 0, 16, 16 )
+44/tile_mode = 0
+44/occluder_offset = Vector2( 8, 8 )
+44/navigation_offset = Vector2( 8, 8 )
+44/shape_offset = Vector2( 0, 0 )
+44/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+44/shape_one_way = false
+44/shape_one_way_margin = 0.0
+44/shapes = [  ]
+44/z_index = 0
+45/name = "Shield"
+45/texture = ExtResource( 6 )
+45/tex_offset = Vector2( 0, 0 )
+45/modulate = Color( 1, 1, 1, 1 )
+45/region = Rect2( 0, 0, 16, 16 )
+45/tile_mode = 0
+45/occluder_offset = Vector2( 8, 8 )
+45/navigation_offset = Vector2( 8, 8 )
+45/shape_offset = Vector2( 0, 0 )
+45/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+45/shape_one_way = false
+45/shape_one_way_margin = 0.0
+45/shapes = [  ]
+45/z_index = 0
+46/name = "Sword"
+46/texture = ExtResource( 8 )
+46/tex_offset = Vector2( 0, 0 )
+46/modulate = Color( 1, 1, 1, 1 )
+46/region = Rect2( 0, 0, 16, 16 )
+46/tile_mode = 0
+46/occluder_offset = Vector2( 8, 8 )
+46/navigation_offset = Vector2( 8, 8 )
+46/shape_offset = Vector2( 0, 0 )
+46/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+46/shape_one_way = false
+46/shape_one_way_margin = 0.0
+46/shapes = [  ]
+46/z_index = 0

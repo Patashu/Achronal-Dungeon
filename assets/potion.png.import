@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/bluesword.png-00ad8d1f8083272b07272f22de5ed646.stex"
+path="res://.import/potion.png-d086389e4541902b898bfc8454ba554d.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/bluesword.png"
-dest_files=[ "res://.import/bluesword.png-00ad8d1f8083272b07272f22de5ed646.stex" ]
+source_file="res://assets/potion.png"
+dest_files=[ "res://.import/potion.png-d086389e4541902b898bfc8454ba554d.stex" ]
 
 [params]
 
