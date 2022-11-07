@@ -37,6 +37,8 @@ var action_primed = false;
 var greenality_timer = 0;
 var green_hero = false;
 var wallhack = false;
+var sounds = {}
+var speakers = [];
 
 func _ready() -> void:
 	# setup hero info
@@ -46,6 +48,7 @@ func _ready() -> void:
 	hero_loc_start = hero_loc;
 	update_hero_info();
 	calculate_map_size();
+	prepare_audio();
 	print_message("Welcome to the Achronal Dungeon! wasd/arrows to move, z to undo, r to restart, mouse to inspect.")
 
 func calculate_map_size() -> void:
@@ -86,6 +89,44 @@ func update_inventory() -> void:
 		inventorymap.tile_set.find_tile_by_name("Greenality"));
 		i += 1;
 
+func prepare_audio() -> void:
+	sounds["bump"] = preload("res://sfx/bump.ogg");
+	sounds["dig"] = preload("res://sfx/dig.ogg");
+	sounds["fly"] = preload("res://sfx/fly.ogg");
+	sounds["getgreenality"] = preload("res://sfx/getgreenality.ogg");
+	sounds["greeninteract"] = preload("res://sfx/greeninteract.ogg");
+	sounds["greenplayer"] = preload("res://sfx/greenplayer.ogg");
+	sounds["greensmall"] = preload("res://sfx/greensmall.ogg");
+	sounds["key"] = preload("res://sfx/key.ogg");
+	sounds["kill"] = preload("res://sfx/kill.ogg");
+	sounds["metarestart"] = preload("res://sfx/metarestart.ogg");
+	sounds["pickup"] = preload("res://sfx/pickup.ogg");
+	sounds["restart"] = preload("res://sfx/restart.ogg");
+	sounds["step"] = preload("res://sfx/step.ogg");
+	sounds["undo"] = preload("res://sfx/undo.ogg");
+	sounds["unlock"] = preload("res://sfx/unlock.ogg");
+	sounds["usegreenality"] = preload("res://sfx/usegreenality.ogg");
+	sounds["wingreen"] = preload("res://sfx/wingreen.ogg");
+	sounds["winnormal"] = preload("res://sfx/winnormal.ogg");
+	sounds["winpickaxe"] = preload("res://sfx/winpickaxe.ogg");
+	sounds["winwings"] = preload("res://sfx/winwings.ogg");
+	
+	for i in range (8):
+		var speaker = AudioStreamPlayer.new();
+		self.add_child(speaker);
+		speakers.append(speaker);
+
+func cut_sound() -> void:
+	for speaker in speakers:
+		speaker.stop();
+
+func play_sound(sound: String) -> void:
+	for speaker in speakers:
+		if !speaker.playing:
+			speaker.stream = sounds[sound];
+			speaker.play();
+			return;
+
 func move_hero(dir: Vector2, warp = false) -> bool:
 	# check multiplier, actor and floor at destination
 	# note: for now I'm putting only the player in the actor layer...
@@ -105,6 +146,7 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 	# no going out of bounds, please
 	if (dest_loc.x < 0 || dest_loc.x > map_x_max || dest_loc.y < 0 || dest_loc.y > map_y_max):
 		print_message("Space and time don't exist out of bounds, sorry.")
+		play_sound("bump");
 		return false;
 	if ("wall" in dest_name):
 		if (pickaxes > 0):
@@ -116,6 +158,7 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 			floormap.set_cellv(dest_loc, -1);
 			multipliermap.set_cellv(dest_loc, -1);
 			can_move = true;
+			play_sound("dig");
 		elif wallhack:
 			print_message("DEBUG: Wallhack is on.");
 			can_move = true;
@@ -163,6 +206,9 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 			add_undo_event(["gain_warpwings", -1], false);
 			warpwings -= 1;
 			print_message("Warped!");
+			play_sound("fly");
+		else:
+			play_sound("step");
 		move_hero_commit(dir);
 	return can_move;
 		
@@ -421,7 +467,7 @@ func update_hover_info() -> void:
 	hoverinfo.text = "";
 	
 	if (has_won):
-		hoverinfo.text = "CREDITS:\n\nPatashu: Concept, devart, programming, level design"
+		hoverinfo.text = "CREDITS:\n\nPatashu: Concept, devart, programming, level design, SFX"
 	
 	if (dest_to_use >= 0):
 		hoversprite.texture = floormap.tile_set.tile_get_texture(dest_to_use);
