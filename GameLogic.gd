@@ -10,6 +10,7 @@ onready var lastmessage : Label = get_node("/root/PlayingField/LastMessage");
 onready var hoverinfo : Label = get_node("/root/PlayingField/HoverInfo");
 onready var hoversprite : Sprite = get_node("/root/PlayingField/HoverSprite");
 onready var hoversprite2 : Sprite = get_node("/root/PlayingField/HoverSprite2");
+onready var soundon : Sprite = get_node("/root/PlayingField/Soundon");
 var hero_loc : Vector2 = Vector2.ZERO;
 var hero_loc_start : Vector2 = Vector2.ZERO;
 var hero_hp : int = 100;
@@ -39,6 +40,7 @@ var green_hero = false;
 var wallhack = false;
 var sounds = {}
 var speakers = [];
+var muted = false;
 
 func _ready() -> void:
 	# setup hero info
@@ -121,11 +123,18 @@ func cut_sound() -> void:
 		speaker.stop();
 
 func play_sound(sound: String) -> void:
+	if muted:
+		return;
 	for speaker in speakers:
 		if !speaker.playing:
 			speaker.stream = sounds[sound];
 			speaker.play();
 			return;
+
+func toggle_mute() -> void:
+	muted = !muted;
+	cut_sound();
+	soundon.visible = !soundon.visible;
 
 func move_hero(dir: Vector2, warp = false) -> bool:
 	# check multiplier, actor and floor at destination
@@ -673,6 +682,9 @@ func _process(delta: float) -> void:
 	if (greenality_timer > 0):
 		greenality_timer -= delta;
 	update_hover_info();
+	# get_rect().has_point(to_local(event.position)):
+	if (Input.is_action_just_pressed("mute") or (Input.is_action_just_pressed("ui_accept") and soundon.get_rect().has_point(soundon.to_local(get_viewport().get_mouse_position())))):
+		toggle_mute();
 	if (Input.is_action_just_pressed("wallhack")):
 		print_message("DEBUG: Wallhack toggled.")
 		wallhack = !wallhack;

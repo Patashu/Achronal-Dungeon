@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://GameLogic.gd" type="Script" id=2]
@@ -6,6 +6,8 @@
 [ext_resource path="res://assets/1.png" type="Texture" id=4]
 [ext_resource path="res://PlayingField.gd" type="Script" id=5]
 [ext_resource path="res://standardfont.tres" type="DynamicFont" id=6]
+[ext_resource path="res://assets/soundoff.png" type="Texture" id=7]
+[ext_resource path="res://assets/soundon.png" type="Texture" id=8]
 
 [node name="PlayingField" type="Node2D"]
 script = ExtResource( 5 )
@@ -77,3 +79,11 @@ position = Vector2( 426, 59 )
 tile_set = ExtResource( 1 )
 cell_size = Vector2( 16, 16 )
 format = 1
+
+[node name="Soundoff" type="Sprite" parent="."]
+position = Vector2( 534, 17 )
+texture = ExtResource( 7 )
+
+[node name="Soundon" type="Sprite" parent="."]
+position = Vector2( 534, 18 )
+texture = ExtResource( 8 )
