@@ -29,6 +29,7 @@ var greenality_avail : int = 0;
 var pickaxes : int = 0;
 var warpwings : int = 0;
 var keys : int = 0;
+var headbands: int = 0;
 var green_tutorial_message_seen : bool = false;
 var greenality_tutorial_message_seen : bool = false;
 var inventory_width : int = 7;
@@ -85,6 +86,10 @@ func update_inventory() -> void:
 	for k in range(warpwings):
 		inventorymap.set_cellv(Vector2(i % inventory_width, floor(i / inventory_width)),
 		inventorymap.tile_set.find_tile_by_name("Warpwings"));
+		i += 1;
+	for k in range(headbands):
+		inventorymap.set_cellv(Vector2(i % inventory_width, floor(i / inventory_width)),
+		inventorymap.tile_set.find_tile_by_name("Headband"));
 		i += 1;
 	for k in range(greenality_avail):
 		inventorymap.set_cellv(Vector2(i % inventory_width, floor(i / inventory_width)),
@@ -198,7 +203,7 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 	# empty tile's fine to move into
 	if (actor_dest == -1 && floor_dest == -1):
 		can_move = true;
-	if ("potion" in dest_name) or ("sword" in dest_name) or ("shield" in dest_name) or ("pickaxe" in dest_name) or ("warpwings" in dest_name) or ("key" in dest_name):
+	if ("potion" in dest_name) or ("sword" in dest_name) or ("shield" in dest_name) or ("pickaxe" in dest_name) or ("warpwings" in dest_name) or ("key" in dest_name) or ("headband" in dest_name):
 		can_move = true;
 		consume_item(dest_loc);
 		if ("key" in dest_name):
@@ -298,6 +303,10 @@ func consume_item(dest_loc: Vector2) -> void:
 		add_undo_event(["gain_pickaxe", multiplier_val], is_green);
 		pickaxes += multiplier_val;
 		message = "You take the " + name_thing(dest_name, multiplier_val) + "! Bump wall to use.";
+	elif ("headband" in dest_name):
+		add_undo_event(["gain_headband", multiplier_val], is_green);
+		headbands += multiplier_val;
+		message = "You take the " + name_thing(dest_name, multiplier_val) + " and prepare to train.";
 	elif ("warpwings" in dest_name):
 		add_undo_event(["gain_warpwings", multiplier_val], is_green);
 		warpwings += multiplier_val;
@@ -312,7 +321,17 @@ func consume_item(dest_loc: Vector2) -> void:
 		# the wounds from fighting a green monster are NOT green
 		add_undo_event(["gain_hp", -enemy_stats[2]], false);
 		hero_hp -= enemy_stats[2];
-		message = "You kill the " + name_thing(dest_name, multiplier_val) + ", losing " + str(enemy_stats[2]) + " HP.";
+		message = "You kill the " + name_thing(dest_name, multiplier_val) + ", losing " + str(enemy_stats[2]) + " HP";
+		if (headbands > 0):
+			if (hero_atk < enemy_stats[0]):
+				add_undo_event(["gain_atk", headbands], false);
+				hero_atk += headbands;
+				message += ", gaining " + str(headbands) + " ATK"
+				if (hero_def < enemy_stats[1]):
+					add_undo_event(["gain_def", headbands], false);
+					hero_def += headbands;
+					message += " and " + str(headbands) + " DEF"
+		message += ".";
 	if (is_green and !green_tutorial_message_seen):
 		green_tutorial_message_seen = true;
 		message += " GREEN changes persist through undo (z) and restart (r)."
@@ -496,6 +515,8 @@ func undo_one_event(event: Array) -> void:
 			play_sound("greensmall");
 	elif (event[0] == "gain_pickaxe"):
 		pickaxes -= event[1];
+	elif (event[0] == "gain_headband"):
+		headbands -= event[1];
 	elif (event[0] == "gain_warpwings"):
 		warpwings -= event[1];
 	elif (event[0] == "gain_key"):
@@ -562,6 +583,9 @@ func update_hover_info() -> void:
 	if ("pickaxe" in dest_name):
 		hoverinfo.text += "\nAllows you to destroy one wall.";
 		
+	if ("headband" in dest_name):
+		hoverinfo.text += "\nAfter combat, gain 1 ATK if you didn't win in one attack, and gain 1 DEF if you took damage.";
+		
 	if ("warpwings" in dest_name):
 		hoverinfo.text += "\nActivate to warp to the opposite tile of the map.";
 		
@@ -618,6 +642,9 @@ func name_thing(dest_name: String, multiplier_val: int) -> String:
 		
 	if ("pickaxe" in dest_name):
 		result += "Pickaxe";
+		
+	if ("headband" in dest_name):
+		result += "Headband";
 		
 	if ("warpwings" in dest_name):
 		result += "Warp Wings";
