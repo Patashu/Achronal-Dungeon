@@ -152,6 +152,8 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 		if (pickaxes > 0):
 			print_message("You dig through the wall.");
 			var is_green = "green" in dest_name;
+			if (is_green): 
+				play_sound("greeninteract");
 			add_undo_event(["gain_pickaxe", -1], false);
 			pickaxes -= 1;
 			add_undo_event(["destroy", dest_loc, dest_name, multiplier_val], is_green);
@@ -168,7 +170,10 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 	if ("lock" in dest_name):
 		if (keys > 0):
 			print_message("You open the lock.");
+			play_sound("unlock");
 			var is_green = "green" in dest_name;
+			if (is_green): 
+				play_sound("greeninteract");
 			add_undo_event(["gain_key", -1], false);
 			keys -= 1;
 			add_undo_event(["destroy", dest_loc, dest_name, multiplier_val], is_green);
@@ -187,9 +192,14 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 	if ("potion" in dest_name) or ("sword" in dest_name) or ("shield" in dest_name) or ("pickaxe" in dest_name) or ("warpwings" in dest_name) or ("key" in dest_name):
 		can_move = true;
 		consume_item(dest_loc);
+		if ("key" in dest_name):
+			play_sound("key");
+		else:
+			play_sound("pickup");
 	if ("greenality" in dest_name):
 		can_move = true;
 		consume_greenality(dest_loc);
+		play_sound("getgreenality");
 	if ("enemy" in dest_name):
 		var enemy_stats = monster_helper(dest_name, multiplier_val);
 		if (enemy_stats[2] > hero_hp):
@@ -198,6 +208,7 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 		else:
 			can_move = true;
 			consume_item(dest_loc);
+			play_sound("kill");
 	if ("win" == dest_name):
 		can_move = true;
 		win(dest_loc);
@@ -210,21 +221,28 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 		else:
 			play_sound("step");
 		move_hero_commit(dir);
+	else:
+		play_sound("bump");
 	return can_move;
 		
 func win(dest_loc: Vector2) -> void:
+	cut_sound();
 	var west = floormap.get_cellv(dest_loc + Vector2.LEFT);
 	var north = floormap.get_cellv(dest_loc + Vector2.UP);
 	var south = floormap.get_cellv(dest_loc + Vector2.DOWN);
 	var message = "You have won! "
 	if (green_hero):
 		message += "GREEN ENDING."
+		play_sound("wingreen");
 	elif west == -1:
 		message += "HEROIC ENDING."
+		play_sound("winnormal");
 	elif north == -1 or south == -1:
 		message += "TUNNEL ENDING."
+		play_sound("winpickaxe");
 	else:
 		message += "ASCENT ENDING."
+		play_sound("winwings");
 	message += " (There are 4 endings.) Undo, restart or meta-restart to continue playing."
 	print_message(message)
 	has_won = true;
@@ -249,6 +267,8 @@ func consume_item(dest_loc: Vector2) -> void:
 	var dest_to_use = floormap.get_cellv(dest_loc);
 	var dest_name = floormap.tile_set.tile_get_name(dest_to_use).to_lower();
 	var is_green = "green" in dest_name;
+	if (is_green): 
+		play_sound("greeninteract");
 	add_undo_event(["destroy", dest_loc, dest_name, multiplier_val], is_green);
 	floormap.set_cellv(dest_loc, -1);
 	multipliermap.set_cellv(dest_loc, -1);
@@ -355,6 +375,7 @@ func try_greenality(dir: Vector2) -> void:
 		hero_turn += 1;
 		hero_keypresses += 1;
 		update_hero_info();
+		play_sound("greenplayer");
 		return;
 		
 	if ("win" == dest_name):
@@ -371,6 +392,7 @@ func try_greenality(dir: Vector2) -> void:
 	hero_turn += 1;
 	hero_keypresses += 1;
 	update_hero_info();
+	play_sound("usegreenality");
 
 func add_undo_event(event: Array, is_green = false) -> void:
 	if (!is_green):
@@ -384,7 +406,7 @@ func print_message(message: String)-> void:
 	lastmessage.text = message;
 
 func meta_restart() -> void:
-	restart();
+	restart(true);
 	# fine as long as doing undo and meta undo events in arbitrary order commutes.
 	# might get weird with Green Player, I'll have to test some things or maybe just hard code it.
 	for event in meta_undo_buffer:
@@ -398,15 +420,18 @@ func meta_restart() -> void:
 	hero_keypresses = 0;
 	greenality_avail = greenality_max;
 	update_hero_info();
+	play_sound("metarestart");
 
-func restart() -> void:
+func restart(is_silent: bool = false) -> void:
 	var hero_keypresses_temp = hero_keypresses;
 	while (hero_turn > 0):
-		undo();
+		undo(true);
 	hero_keypresses = hero_keypresses_temp + 1;
 	update_hero_info();
+	if (!is_silent):
+		play_sound("restart");
 
-func undo() -> void:
+func undo(is_silent: bool = false) -> void:
 	if (hero_turn <= 0):
 		return
 	var events = undo_buffer.pop_back();
@@ -416,12 +441,18 @@ func undo() -> void:
 	hero_turn -= 1;
 	hero_keypresses += 1;
 	update_hero_info();
+	if (!is_silent):
+		play_sound("undo");
 
 func undo_one_event(event: Array) -> void:
-	if (event[0] == "move" and !green_hero):
-		move_hero_silently(event[1] - hero_loc);
+	if (event[0] == "move"):
+		if !green_hero:
+			move_hero_silently(event[1] - hero_loc);
+		else:
+			play_sound("greensmall");
 	elif (event[0] == "win"):
 		has_won = false;
+		cut_sound();
 	elif (event[0] == "destroy"):
 		var dest_loc = event[1];
 		var dest_name = event[2];
@@ -439,12 +470,21 @@ func undo_one_event(event: Array) -> void:
 	elif (event[0] == "green_player"):
 		green_hero = false;
 		actormap.set_cellv(hero_loc, actormap.tile_set.find_tile_by_name("Player"));
-	elif (event[0] == "gain_hp" and !green_hero):
-		hero_hp -= event[1];
-	elif (event[0] == "gain_atk" and !green_hero):
-		hero_atk -= event[1];
-	elif (event[0] == "gain_def" and !green_hero):
-		hero_def -= event[1];
+	elif (event[0] == "gain_hp"):
+		if !green_hero:
+			hero_hp -= event[1];
+		else:
+			play_sound("greensmall");
+	elif (event[0] == "gain_atk"):
+		if !green_hero:
+			hero_atk -= event[1];
+		else:
+			play_sound("greensmall");
+	elif (event[0] == "gain_def"):
+		if !green_hero:
+			hero_def -= event[1];
+		else:
+			play_sound("greensmall");
 	elif (event[0] == "gain_pickaxe"):
 		pickaxes -= event[1];
 	elif (event[0] == "gain_warpwings"):
