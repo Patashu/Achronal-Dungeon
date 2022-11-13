@@ -54,6 +54,16 @@ custom_colors/font_color = Color( 0.988235, 0.921569, 0.713726, 1 )
 custom_fonts/font = ExtResource( 6 )
 text = "dummy text"
 
+[node name="LocationInfo" type="Label" parent="."]
+margin_left = 453.0
+margin_top = 106.0
+margin_right = 497.0
+margin_bottom = 117.0
+custom_colors/font_color = Color( 0.988235, 0.921569, 0.713726, 1 )
+custom_fonts/font = ExtResource( 6 )
+text = "(99, 99)"
+autowrap = true
+
 [node name="HoverInfo" type="Label" parent="."]
 margin_left = 418.0
 margin_top = 125.0

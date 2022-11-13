@@ -10,6 +10,7 @@ onready var lastmessage : Label = get_node("/root/PlayingField/LastMessage");
 onready var hoverinfo : Label = get_node("/root/PlayingField/HoverInfo");
 onready var hoversprite : Sprite = get_node("/root/PlayingField/HoverSprite");
 onready var hoversprite2 : Sprite = get_node("/root/PlayingField/HoverSprite2");
+onready var locationinfo : Label = get_node("/root/PlayingField/LocationInfo");
 onready var soundon : Sprite = get_node("/root/PlayingField/Soundon");
 var hero_loc : Vector2 = Vector2.ZERO;
 var hero_loc_start : Vector2 = Vector2.ZERO;
@@ -541,6 +542,11 @@ func update_hover_info() -> void:
 	hoversprite2.texture = null;
 	hoversprite.texture = null;
 	hoverinfo.text = "";
+	
+	if !(dest_loc.x < 0 || dest_loc.x > map_x_max || dest_loc.y < 0 || dest_loc.y > map_y_max):
+		locationinfo.text = "(" + str(dest_loc.x) + ", " + str(dest_loc.y) + ")";
+	else:
+		locationinfo.text = ""
 	
 	if (has_won):
 		hoverinfo.text = "CREDITS:\n\nPatashu: Concept, devart, programming, level design, SFX"
