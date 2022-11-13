@@ -2,9 +2,9 @@ Achronal Dungeon is a game made for the Thinky Puzzle Games Confounding Calendar
 
 Controls:
 
-* WASD/Arrow keys to move.
+* WASD/Arrow keys to move. Hold Shift to run.
 * Mouse over things to learn more about them.
-* z/u/Backspace to undo.
+* z/u/Backspace to undo. Hold shift to undo to the last state change.
 * R to restart (equivalent to holding down undo).
 * Esc to Meta-Restart (refunding all spent Greenalities).
 * X to use Warp Wings.

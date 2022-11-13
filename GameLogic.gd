@@ -141,7 +141,7 @@ func toggle_mute() -> void:
 	cut_sound();
 	soundon.visible = !soundon.visible;
 
-func move_hero(dir: Vector2, warp = false) -> bool:
+func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bool:
 	# check multiplier, actor and floor at destination
 	# note: for now I'm putting only the player in the actor layer...
 	# and ONLY because the player might overlap things (most notably the goal)
@@ -162,7 +162,7 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 		print_message("Space and time don't exist out of bounds, sorry.")
 		play_sound("bump");
 		return false;
-	if ("wall" in dest_name):
+	if ("wall" in dest_name and !is_running):
 		if (pickaxes > 0):
 			print_message("You dig through the wall.");
 			var is_green = "green" in dest_name;
@@ -181,7 +181,7 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 		else:
 			print_message("You bump into the wall.");
 			can_move = false;
-	if ("lock" in dest_name):
+	if ("lock" in dest_name and !is_running):
 		if (keys > 0):
 			print_message("You open the lock.");
 			play_sound("unlock");
@@ -214,7 +214,7 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 		can_move = true;
 		consume_greenality(dest_loc);
 		play_sound("getgreenality");
-	if ("enemy" in dest_name):
+	if ("enemy" in dest_name and !is_running):
 		var enemy_stats = monster_helper(dest_name, multiplier_val);
 		if (enemy_stats[2] > hero_hp):
 			can_move = false;
@@ -232,10 +232,10 @@ func move_hero(dir: Vector2, warp = false) -> bool:
 			warpwings -= 1;
 			print_message("Warped!");
 			play_sound("fly");
-		else:
+		elif (!is_running):
 			play_sound("step");
 		move_hero_commit(dir);
-	else:
+	elif (!is_running):
 		play_sound("bump");
 	return can_move;
 		
@@ -459,21 +459,26 @@ func restart(is_silent: bool = false) -> void:
 	if (!is_silent):
 		play_sound("restart");
 
-func undo(is_silent: bool = false) -> void:
+func undo(is_silent: bool = false) -> bool:
 	if (hero_turn <= 0):
-		return
+		return true;
 	var events = undo_buffer.pop_back();
+	var stateful = false;
 	for event in events:
-		undo_one_event(event);
+		var dummy = undo_one_event(event);
+		stateful = stateful or dummy;
 		
 	hero_turn -= 1;
 	hero_keypresses += 1;
 	update_hero_info();
 	if (!is_silent):
 		play_sound("undo");
+	return stateful;
 
-func undo_one_event(event: Array) -> void:
+func undo_one_event(event: Array) -> bool:
+	var stateful = true;
 	if (event[0] == "move"):
+		stateful = false;
 		if !green_hero:
 			move_hero_silently(event[1] - hero_loc);
 		else:
@@ -521,6 +526,7 @@ func undo_one_event(event: Array) -> void:
 		warpwings -= event[1];
 	elif (event[0] == "gain_key"):
 		keys -= event[1];
+	return stateful;
 
 func update_hover_info() -> void:
 	var dest_loc = floormap.world_to_map(get_viewport().get_mouse_position());
@@ -716,7 +722,14 @@ func _process(delta: float) -> void:
 		print_message("DEBUG: Wallhack toggled.")
 		wallhack = !wallhack;
 	if (Input.is_action_just_pressed("undo")):
-		undo();
+		if (Input.is_action_pressed("run_modifier")):
+			var stateful = false;
+			var is_silent = false;
+			while !stateful:
+				stateful = undo(is_silent);
+				is_silent = true;
+		else:
+			undo();
 	if (Input.is_action_just_pressed("restart")):
 		restart();
 	if (Input.is_action_just_pressed("meta_restart")):
@@ -748,4 +761,11 @@ func _process(delta: float) -> void:
 			try_greenality(dir);
 			action_primed = false;
 		else:
-			move_hero(dir);
+			if (Input.is_action_pressed("run_modifier")):
+				var is_running = false;
+				var result = true;
+				while result:
+					result = move_hero(dir, false, is_running);
+					is_running = true;
+			else:
+				move_hero(dir);
