@@ -723,7 +723,7 @@ func _process(delta: float) -> void:
 	# get_rect().has_point(to_local(event.position)):
 	if (Input.is_action_just_pressed("mute") or (Input.is_action_just_pressed("ui_accept") and soundon.get_rect().has_point(soundon.to_local(get_viewport().get_mouse_position())))):
 		toggle_mute();
-	if (Input.is_action_just_pressed("wallhack")):
+	if (Input.is_action_just_pressed("wallhack") and OS.is_debug_build()):
 		print_message("DEBUG: Wallhack toggled.")
 		wallhack = !wallhack;
 	if (Input.is_action_just_pressed("undo")):
