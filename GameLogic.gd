@@ -581,13 +581,13 @@ func update_hover_info() -> void:
 		hoverinfo.text += "\nImpervious without a Pickaxe.";
 		
 	if ("potion" in dest_name):
-		hoverinfo.text += "\nIncreases your HP by " + str(multiplier_val);
+		hoverinfo.text += "\nIncreases your HP by " + str(multiplier_val) + ".";
 		
 	if ("sword" in dest_name):
-		hoverinfo.text += "\nIncreases your ATK by " + str(multiplier_val);
+		hoverinfo.text += "\nIncreases your ATK by " + str(multiplier_val) + ".";
 	
 	if ("shield" in dest_name):
-		hoverinfo.text += "\nIncreases your DEF by " + str(multiplier_val);
+		hoverinfo.text += "\nIncreases your DEF by " + str(multiplier_val) + ".";
 		
 	if ("enemy" in dest_name):
 		var enemy_stats = monster_helper(dest_name, multiplier_val);
