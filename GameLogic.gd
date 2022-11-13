@@ -555,7 +555,7 @@ func update_hover_info() -> void:
 		locationinfo.text = ""
 	
 	if (has_won):
-		hoverinfo.text = "CREDITS:\n\nPatashu: Concept, devart, programming, level design, SFX"
+		hoverinfo.text = "CREDITS:\n\nPatashu: Concept, devart, programming, level design, SFX\n\nPlaytesters: VoxSomniator"
 	
 	if (dest_to_use >= 0):
 		hoversprite.texture = floormap.tile_set.tile_get_texture(dest_to_use);
