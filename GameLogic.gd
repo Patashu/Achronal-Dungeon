@@ -43,6 +43,7 @@ var wallhack = false;
 var sounds = {}
 var speakers = [];
 var muted = false;
+var last_info_loc = Vector2(99, 99);
 
 func _ready() -> void:
 	# setup hero info
@@ -72,6 +73,7 @@ func update_hero_info() -> void:
 	else:
 		heroinfo.text += "Turn: " + str(hero_turn) + "\r\n";
 	update_inventory();
+	last_info_loc = Vector2(99, 99); # to un-cache it
 	
 func update_inventory() -> void:
 	inventorymap.clear();
@@ -531,6 +533,10 @@ func undo_one_event(event: Array) -> bool:
 
 func update_hover_info() -> void:
 	var dest_loc = floormap.world_to_map(get_viewport().get_mouse_position());
+	if (dest_loc == last_info_loc):
+		return
+	else:
+		last_info_loc = dest_loc;
 	var multiplier_dest = multipliermap.get_cellv(dest_loc);
 	var actor_dest = actormap.get_cellv(dest_loc);
 	var floor_dest = floormap.get_cellv(dest_loc);
