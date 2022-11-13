@@ -707,14 +707,7 @@ func monster_helper(name: String, multiplier_val: int) -> Array:
 		result[2] = INF;
 		return result;
 	# fight time!
-	var enemy_hp_temp = result[0];
-	var hero_hp_temp = hero_hp;
-	# TODO: could accelerate this with SIMPLE MATH but let's do it the easy way for now
-	enemy_hp_temp -= hero_atk;
-	while (enemy_hp_temp > 0):
-		hero_hp_temp -= (result[1] - hero_def);
-		enemy_hp_temp -= hero_atk;
-	result[2] = hero_hp - hero_hp_temp;
+	result[2] = max(0, (result[1]-hero_def)*(ceil(float(result[0])/float(hero_atk))-1));
 	return result;
 
 func multiplier_id_to_number(id: int) -> int:
