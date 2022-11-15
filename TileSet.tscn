@@ -1,4 +1,4 @@
-[gd_scene load_steps=73 format=2]
+[gd_scene load_steps=89 format=2]
 
 [ext_resource path="res://assets/greensword.png" type="Texture" id=1]
 [ext_resource path="res://assets/player.png" type="Texture" id=2]
@@ -66,6 +66,14 @@
 [ext_resource path="res://assets/greenshield2.png" type="Texture" id=64]
 [ext_resource path="res://assets/greenpotion2.png" type="Texture" id=65]
 [ext_resource path="res://assets/potion2.png" type="Texture" id=66]
+[ext_resource path="res://assets/key2.png" type="Texture" id=67]
+[ext_resource path="res://assets/greenkey2.png" type="Texture" id=68]
+[ext_resource path="res://assets/greenpickaxe2.png" type="Texture" id=69]
+[ext_resource path="res://assets/pickaxe2.png" type="Texture" id=70]
+[ext_resource path="res://assets/warpwings2.png" type="Texture" id=71]
+[ext_resource path="res://assets/greenwarpwings2.png" type="Texture" id=72]
+[ext_resource path="res://assets/headband2.png" type="Texture" id=73]
+[ext_resource path="res://assets/greenheadband2.png" type="Texture" id=74]
 
 [sub_resource type="AnimatedTexture" id=6]
 frames = 2
@@ -107,6 +115,62 @@ frames = 2
 fps = 1.0
 frame_0/texture = ExtResource( 1 )
 frame_1/texture = ExtResource( 62 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=9]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 29 )
+frame_1/texture = ExtResource( 69 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=11]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 35 )
+frame_1/texture = ExtResource( 72 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=10]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 32 )
+frame_1/texture = ExtResource( 70 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=12]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 34 )
+frame_1/texture = ExtResource( 71 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=7]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 41 )
+frame_1/texture = ExtResource( 67 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=8]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 39 )
+frame_1/texture = ExtResource( 68 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=13]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 56 )
+frame_1/texture = ExtResource( 73 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=14]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 57 )
+frame_1/texture = ExtResource( 74 )
 frame_1/delay_sec = 0.0
 
 [node name="TileSet" type="Node2D"]
@@ -233,7 +297,7 @@ texture = ExtResource( 28 )
 
 [node name="Greenpickaxe" type="Sprite" parent="."]
 position = Vector2( 65, 111 )
-texture = ExtResource( 29 )
+texture = SubResource( 9 )
 
 [node name="Greenplayer" type="Sprite" parent="."]
 position = Vector2( 65, 111 )
@@ -245,7 +309,7 @@ texture = ExtResource( 27 )
 
 [node name="Greenwarpwings" type="Sprite" parent="."]
 position = Vector2( 146, 125 )
-texture = ExtResource( 35 )
+texture = SubResource( 11 )
 
 [node name="Magicmirror" type="Sprite" parent="."]
 position = Vector2( 146, 125 )
@@ -253,15 +317,15 @@ texture = ExtResource( 37 )
 
 [node name="Pickaxe" type="Sprite" parent="."]
 position = Vector2( 146, 125 )
-texture = ExtResource( 32 )
+texture = SubResource( 10 )
 
 [node name="Warpwings" type="Sprite" parent="."]
 position = Vector2( 146, 125 )
-texture = ExtResource( 34 )
+texture = SubResource( 12 )
 
 [node name="Key" type="Sprite" parent="."]
 position = Vector2( 46, 159 )
-texture = ExtResource( 41 )
+texture = SubResource( 7 )
 
 [node name="Lock" type="Sprite" parent="."]
 position = Vector2( 46, 159 )
@@ -269,7 +333,7 @@ texture = ExtResource( 40 )
 
 [node name="Greenkey" type="Sprite" parent="."]
 position = Vector2( 80, 183 )
-texture = ExtResource( 39 )
+texture = SubResource( 8 )
 
 [node name="Greenlock" type="Sprite" parent="."]
 position = Vector2( 80, 183 )
@@ -334,11 +398,11 @@ texture = ExtResource( 49 )
 
 [node name="Headband" type="Sprite" parent="."]
 position = Vector2( -8, 185 )
-texture = ExtResource( 56 )
+texture = SubResource( 13 )
 
 [node name="Greenheadband" type="Sprite" parent="."]
 position = Vector2( -14, 199 )
-texture = ExtResource( 57 )
+texture = SubResource( 14 )
 
 [node name="25" type="Sprite" parent="."]
 position = Vector2( -81, 135 )
