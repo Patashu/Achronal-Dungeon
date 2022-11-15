@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=60 format=2]
+[gd_resource type="TileSet" load_steps=72 format=2]
 
 [ext_resource path="res://assets/greensword.png" type="Texture" id=1]
 [ext_resource path="res://assets/player.png" type="Texture" id=2]
@@ -59,10 +59,58 @@
 [ext_resource path="res://assets/35.png" type="Texture" id=57]
 [ext_resource path="res://assets/300.png" type="Texture" id=58]
 [ext_resource path="res://assets/25.png" type="Texture" id=59]
+[ext_resource path="res://assets/sword2.png" type="Texture" id=60]
+[ext_resource path="res://assets/greensword2.png" type="Texture" id=61]
+[ext_resource path="res://assets/shield2.png" type="Texture" id=62]
+[ext_resource path="res://assets/greenshield2.png" type="Texture" id=63]
+[ext_resource path="res://assets/greenpotion2.png" type="Texture" id=64]
+[ext_resource path="res://assets/potion2.png" type="Texture" id=65]
+
+[sub_resource type="AnimatedTexture" id=6]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 5 )
+frame_1/texture = ExtResource( 65 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=3]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 6 )
+frame_1/texture = ExtResource( 62 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=1]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 8 )
+frame_1/texture = ExtResource( 60 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=5]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 11 )
+frame_1/texture = ExtResource( 64 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=4]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 10 )
+frame_1/texture = ExtResource( 63 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=2]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 1 )
+frame_1/texture = ExtResource( 61 )
+frame_1/delay_sec = 0.0
 
 [resource]
 0/name = "Potion"
-0/texture = ExtResource( 5 )
+0/texture = SubResource( 6 )
 0/tex_offset = Vector2( 0, 0 )
 0/modulate = Color( 1, 1, 1, 1 )
 0/region = Rect2( 0, 0, 16, 16 )
@@ -76,7 +124,7 @@
 0/shapes = [  ]
 0/z_index = 0
 1/name = "Shield"
-1/texture = ExtResource( 6 )
+1/texture = SubResource( 3 )
 1/tex_offset = Vector2( 0, 0 )
 1/modulate = Color( 1, 1, 1, 1 )
 1/region = Rect2( 0, 0, 16, 16 )
@@ -90,7 +138,7 @@
 1/shapes = [  ]
 1/z_index = 0
 2/name = "Sword"
-2/texture = ExtResource( 8 )
+2/texture = SubResource( 1 )
 2/tex_offset = Vector2( 0, 0 )
 2/modulate = Color( 1, 1, 1, 1 )
 2/region = Rect2( 0, 0, 16, 16 )
@@ -132,7 +180,7 @@
 4/shapes = [  ]
 4/z_index = 0
 5/name = "Greenpotion"
-5/texture = ExtResource( 11 )
+5/texture = SubResource( 5 )
 5/tex_offset = Vector2( 0, 0 )
 5/modulate = Color( 1, 1, 1, 1 )
 5/region = Rect2( 0, 0, 16, 16 )
@@ -146,7 +194,7 @@
 5/shapes = [  ]
 5/z_index = 0
 6/name = "Greenshield"
-6/texture = ExtResource( 10 )
+6/texture = SubResource( 4 )
 6/tex_offset = Vector2( 0, 0 )
 6/modulate = Color( 1, 1, 1, 1 )
 6/region = Rect2( 0, 0, 16, 16 )
@@ -160,7 +208,7 @@
 6/shapes = [  ]
 6/z_index = 0
 7/name = "Greensword"
-7/texture = ExtResource( 1 )
+7/texture = SubResource( 2 )
 7/tex_offset = Vector2( 0, 0 )
 7/modulate = Color( 1, 1, 1, 1 )
 7/region = Rect2( 0, 0, 16, 16 )
