@@ -260,7 +260,7 @@ func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bo
 		
 func win(dest_loc: Vector2) -> void:
 	cut_sound();
-	winning_timer = 2;
+	winning_timer = 5;
 	if (green_hero):
 		actormap.set_cellv(hero_loc, actormap.tile_set.find_tile_by_name("GreenplayerWin"));
 	else:
@@ -748,7 +748,7 @@ func _process(delta: float) -> void:
 		greenality_timer -= delta;
 	if (winning_timer > 0):
 		winning_timer -= delta;
-		var t = max(0, winning_timer/2);
+		var t = min(1, max(0, winning_timer/3));
 		actormap.modulate = Color(t, t, t, t);
 	update_hover_info();
 	if (Input.is_action_just_pressed("mute") or (Input.is_action_just_pressed("ui_accept") and soundon.get_rect().has_point(soundon.to_local(get_viewport().get_mouse_position())))):
