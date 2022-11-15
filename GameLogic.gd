@@ -704,7 +704,7 @@ func name_thing(dest_name: String, multiplier_val: int) -> String:
 		result += "Lock";
 	
 	if (multiplier_val > 1):
-		result += "(x" + str(multiplier_val) + ")"
+		result += " (x" + str(multiplier_val) + ")"
 	
 	return result;
 

@@ -91,6 +91,7 @@ position = Vector2( 441, 110 )
 texture = ExtResource( 3 )
 
 [node name="HoverSprite2" type="Sprite" parent="."]
+visible = false
 position = Vector2( 441, 110 )
 texture = ExtResource( 4 )
 
