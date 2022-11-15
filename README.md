@@ -10,6 +10,7 @@ Controls:
 * X to use Warp Wings.
 * X+Dir to use Greenality.
 * M or click on the note icon in the top right corner to toggle SFX.
+* P or click on the slime icon in the top right corner to toggle animations.
 * (DEBUG BUILDS ONLY) ` to toggle Wallhack.
 
 If you have fully completed the game, you can compete by optimising for HP or turn count.
