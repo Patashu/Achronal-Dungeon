@@ -39,6 +39,7 @@ var map_x_max : int = 0; # 31
 var map_y_max : int = 0; # 20
 var action_primed = false;
 var greenality_timer = 0;
+var winning_timer = 0;
 var green_hero = false;
 var wallhack = false;
 var sounds = {}
@@ -259,6 +260,11 @@ func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bo
 		
 func win(dest_loc: Vector2) -> void:
 	cut_sound();
+	winning_timer = 2;
+	if (green_hero):
+		actormap.set_cellv(hero_loc, actormap.tile_set.find_tile_by_name("GreenplayerWin"));
+	else:
+		actormap.set_cellv(hero_loc, actormap.tile_set.find_tile_by_name("PlayerWin"));
 	var west = floormap.get_cellv(dest_loc + Vector2.LEFT);
 	var north = floormap.get_cellv(dest_loc + Vector2.UP);
 	var south = floormap.get_cellv(dest_loc + Vector2.DOWN);
@@ -503,6 +509,12 @@ func undo_one_event(event: Array) -> bool:
 			play_sound("greensmall");
 	elif (event[0] == "win"):
 		has_won = false;
+		winning_timer = 0;
+		actormap.modulate = Color(1, 1, 1, 1);
+		if (green_hero):
+			actormap.set_cellv(hero_loc, actormap.tile_set.find_tile_by_name("Greenplayer"));
+		else:
+			actormap.set_cellv(hero_loc, actormap.tile_set.find_tile_by_name("Player"));
 		cut_sound();
 	elif (event[0] == "destroy"):
 		var dest_loc = event[1];
@@ -734,6 +746,10 @@ func multiplier_id_to_number(id: int) -> int:
 func _process(delta: float) -> void:
 	if (greenality_timer > 0):
 		greenality_timer -= delta;
+	if (winning_timer > 0):
+		winning_timer -= delta;
+		var t = max(0, winning_timer/2);
+		actormap.modulate = Color(t, t, t, t);
 	update_hover_info();
 	if (Input.is_action_just_pressed("mute") or (Input.is_action_just_pressed("ui_accept") and soundon.get_rect().has_point(soundon.to_local(get_viewport().get_mouse_position())))):
 		toggle_mute();
