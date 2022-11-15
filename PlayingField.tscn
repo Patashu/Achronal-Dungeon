@@ -91,9 +91,9 @@ cell_size = Vector2( 16, 16 )
 format = 1
 
 [node name="Soundoff" type="Sprite" parent="."]
-position = Vector2( 534, 17 )
+position = Vector2( 534, 16 )
 texture = ExtResource( 7 )
 
 [node name="Soundon" type="Sprite" parent="."]
-position = Vector2( 534, 18 )
+position = Vector2( 534, 16 )
 texture = ExtResource( 8 )
