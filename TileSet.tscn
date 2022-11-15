@@ -1,4 +1,4 @@
-[gd_scene load_steps=89 format=2]
+[gd_scene load_steps=107 format=2]
 
 [ext_resource path="res://assets/greensword.png" type="Texture" id=1]
 [ext_resource path="res://assets/player.png" type="Texture" id=2]
@@ -74,6 +74,15 @@
 [ext_resource path="res://assets/greenwarpwings2.png" type="Texture" id=72]
 [ext_resource path="res://assets/headband2.png" type="Texture" id=73]
 [ext_resource path="res://assets/greenheadband2.png" type="Texture" id=74]
+[ext_resource path="res://assets/enemyslime2.png" type="Texture" id=75]
+[ext_resource path="res://assets/greenenemyslime2.png" type="Texture" id=76]
+[ext_resource path="res://assets/enemyguard2.png" type="Texture" id=77]
+[ext_resource path="res://assets/greenenemyguard2.png" type="Texture" id=78]
+[ext_resource path="res://assets/enemyteeth2.png" type="Texture" id=79]
+[ext_resource path="res://assets/greenenemyteeth2.png" type="Texture" id=80]
+[ext_resource path="res://assets/greenenemyfire2.png" type="Texture" id=81]
+[ext_resource path="res://assets/enemyfire2.png" type="Texture" id=82]
+[ext_resource path="res://assets/greenality2.png" type="Texture" id=83]
 
 [sub_resource type="AnimatedTexture" id=6]
 frames = 2
@@ -96,6 +105,20 @@ frame_0/texture = ExtResource( 6 )
 frame_1/texture = ExtResource( 61 )
 frame_1/delay_sec = 0.0
 
+[sub_resource type="AnimatedTexture" id=17]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 9 )
+frame_1/texture = ExtResource( 77 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=23]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 4 )
+frame_1/texture = ExtResource( 83 )
+frame_1/delay_sec = 0.0
+
 [sub_resource type="AnimatedTexture" id=5]
 frames = 2
 fps = 1.0
@@ -115,6 +138,55 @@ frames = 2
 fps = 1.0
 frame_0/texture = ExtResource( 1 )
 frame_1/texture = ExtResource( 62 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=22]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 26 )
+frame_1/texture = ExtResource( 82 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=15]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 24 )
+frame_1/texture = ExtResource( 75 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=19]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 25 )
+frame_1/texture = ExtResource( 79 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=18]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 33 )
+frame_1/texture = ExtResource( 78 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=21]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 30 )
+frame_1/texture = ExtResource( 81 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=16]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 36 )
+frame_1/texture = ExtResource( 76 )
+frame_1/delay_sec = 0.0
+
+[sub_resource type="AnimatedTexture" id=20]
+frames = 2
+fps = 1.0
+frame_0/texture = ExtResource( 28 )
+frame_1/texture = ExtResource( 80 )
 frame_1/delay_sec = 0.0
 
 [sub_resource type="AnimatedTexture" id=9]
@@ -189,11 +261,11 @@ texture = SubResource( 1 )
 
 [node name="Enemyguard" type="Sprite" parent="."]
 position = Vector2( -86, 94 )
-texture = ExtResource( 9 )
+texture = SubResource( 17 )
 
 [node name="Greenality" type="Sprite" parent="."]
 position = Vector2( -86, 94 )
-texture = ExtResource( 4 )
+texture = SubResource( 23 )
 
 [node name="Greenpotion" type="Sprite" parent="."]
 position = Vector2( -86, 94 )
@@ -269,31 +341,31 @@ texture = ExtResource( 13 )
 
 [node name="Enemyfire" type="Sprite" parent="."]
 position = Vector2( 14, 103 )
-texture = ExtResource( 26 )
+texture = SubResource( 22 )
 
 [node name="Enemyslime" type="Sprite" parent="."]
 position = Vector2( 14, 103 )
-texture = ExtResource( 24 )
+texture = SubResource( 15 )
 
 [node name="Enemyteeth" type="Sprite" parent="."]
 position = Vector2( 14, 103 )
-texture = ExtResource( 25 )
+texture = SubResource( 19 )
 
 [node name="Greenenemyguard" type="Sprite" parent="."]
 position = Vector2( 65, 111 )
-texture = ExtResource( 33 )
+texture = SubResource( 18 )
 
 [node name="Greenenemyfire" type="Sprite" parent="."]
 position = Vector2( 65, 111 )
-texture = ExtResource( 30 )
+texture = SubResource( 21 )
 
 [node name="Greenenemyslime" type="Sprite" parent="."]
 position = Vector2( 65, 111 )
-texture = ExtResource( 36 )
+texture = SubResource( 16 )
 
 [node name="Greenenemyteeth" type="Sprite" parent="."]
 position = Vector2( 65, 111 )
-texture = ExtResource( 28 )
+texture = SubResource( 20 )
 
 [node name="Greenpickaxe" type="Sprite" parent="."]
 position = Vector2( 65, 111 )
