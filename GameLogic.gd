@@ -12,6 +12,7 @@ onready var hoversprite : Sprite = get_node("/root/PlayingField/HoverSprite");
 onready var hoversprite2 : Sprite = get_node("/root/PlayingField/HoverSprite2");
 onready var locationinfo : Label = get_node("/root/PlayingField/LocationInfo");
 onready var soundon : Sprite = get_node("/root/PlayingField/Soundon");
+onready var pauseon : Sprite = get_node("/root/PlayingField/Pauseon");
 var hero_loc : Vector2 = Vector2.ZERO;
 var hero_loc_start : Vector2 = Vector2.ZERO;
 var hero_hp : int = 100;
@@ -43,6 +44,7 @@ var wallhack = false;
 var sounds = {}
 var speakers = [];
 var muted = false;
+var paused = false;
 var last_info_loc = Vector2(99, 99);
 
 func _ready() -> void:
@@ -143,6 +145,19 @@ func toggle_mute() -> void:
 	muted = !muted;
 	cut_sound();
 	soundon.visible = !soundon.visible;
+	
+func toggle_pause() -> void:
+	paused = !paused;
+	pauseon.visible = !pauseon.visible;
+	var fps = 1;
+	if (paused):
+		fps = 0;
+	var tile_ids = floormap.tile_set.get_tiles_ids();
+	for tile_id in tile_ids:
+		var texture = floormap.tile_set.tile_get_texture(tile_id);
+		if texture is AnimatedTexture:
+			var animtex = texture as AnimatedTexture;
+			animtex.fps = fps;
 
 func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bool:
 	# check multiplier, actor and floor at destination
@@ -555,7 +570,7 @@ func update_hover_info() -> void:
 		locationinfo.text = ""
 	
 	if (has_won):
-		hoverinfo.text = "CREDITS:\n\nPatashu: Concept, devart, programming, level design, SFX\n\nPlaytesters: VoxSomniator"
+		hoverinfo.text = "CREDITS:\n\nPatashu: Concept, programming, level design, SFX\n\nArt: RoxxyRobofox#6767\n\nPlaytesters: VoxSomniator"
 	
 	if (dest_to_use >= 0):
 		hoversprite.texture = floormap.tile_set.tile_get_texture(dest_to_use);
@@ -720,9 +735,10 @@ func _process(delta: float) -> void:
 	if (greenality_timer > 0):
 		greenality_timer -= delta;
 	update_hover_info();
-	# get_rect().has_point(to_local(event.position)):
 	if (Input.is_action_just_pressed("mute") or (Input.is_action_just_pressed("ui_accept") and soundon.get_rect().has_point(soundon.to_local(get_viewport().get_mouse_position())))):
 		toggle_mute();
+	if (Input.is_action_just_pressed("pause_animations") or (Input.is_action_just_pressed("ui_accept") and pauseon.get_rect().has_point(pauseon.to_local(get_viewport().get_mouse_position())))):
+		toggle_pause();
 	if (Input.is_action_just_pressed("wallhack") and OS.is_debug_build()):
 		print_message("DEBUG: Wallhack toggled.")
 		wallhack = !wallhack;
