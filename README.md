@@ -1,5 +1,7 @@
 Achronal Dungeon is a game made for the Thinky Puzzle Games Confounding Calendar 2022 Gamejam. It is a one screen, one level dungeon crawler that is initially impossible, but through the use of time travel based exploits can be tilted in your favour.
 
+Play here: https://patashu.itch.io/achronal-dungeon
+
 Controls:
 
 * WASD/Arrow keys to move. Hold Shift to run.
