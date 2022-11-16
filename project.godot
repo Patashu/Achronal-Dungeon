@@ -23,7 +23,11 @@ _global_script_class_icons={
 config/name="Achronal Dungeon"
 config/description="Achronal Dungeon is a game made for the Thinky Puzzle Games Confounding Calendar 2022 Gamejam. It is a one screen, one level dungeon crawler that is initially impossible, but through the use of time travel based exploits can be tilted in your favour."
 run/main_scene="res://PlayingField.tscn"
-config/icon="res://icon.png"
+boot_splash/image="res://achronaldungeonbanner.png"
+boot_splash/fullsize=false
+boot_splash/use_filter=false
+boot_splash/bg_color=Color( 0.305882, 0.368627, 0.368627, 1 )
+config/icon="res://assets/player.png"
 
 [display]
 
