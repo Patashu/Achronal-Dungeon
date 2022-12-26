@@ -906,6 +906,8 @@ func action_previews_on() -> void:
 			var floor_dest = floormap.get_cellv(dest_loc);
 			if (floor_dest > -1):
 				var dest_name = floormap.tile_set.tile_get_name(floor_dest).to_lower();
+				if (dest_name == "magicmirror"):
+					dest_name = "player";
 				var green_result = floormap.tile_set.find_tile_by_name("Green" + dest_name);
 				if (green_result > -1):
 					preview.visible = true;
