@@ -40,6 +40,7 @@ var inventory_width : int = 7;
 var map_x_max : int = 0; # 31
 var map_y_max : int = 0; # 20
 var action_primed = false;
+var timer = 0;
 var greenality_timer = 0;
 var winning_timer = 0;
 var green_hero = false;
@@ -80,7 +81,11 @@ func update_hero_info() -> void:
 	else:
 		heroinfo.text += "Turn: " + str(hero_turn) + "\r\n";
 	update_inventory();
-	last_info_loc = Vector2(99, 99); # to un-cache it
+	# unless the player is mousing over a monster, 'fall off' the hover info to the controls
+	if (!("would lose" in hoverinfo.text)):
+		controls_tutorial();
+	else:
+		last_info_loc = Vector2(99, 99); # to un-cache it
 	
 func update_inventory() -> void:
 	inventorymap.clear();
@@ -578,36 +583,40 @@ func undo_one_event(event: Array) -> bool:
 	return stateful;
 
 func controls_tutorial() -> void:
-	if (hoverinfo.text == ""):
-		# 0: start of game
-		# 1: just picked up green sword
-		# 2: has used undo or restart
-		# 3: has picked up greenality
-		# 4: has used greenality
-		# 5: has picked up warp wings
-		# 6: has used warp wings
-		hoverinfo.text += "Controls:\n"
-		hoverinfo.text += "WASD to Move\n"
-		hoverinfo.text += "Mouse to Inspect/Move\n"
-		hoverinfo2.text = hoverinfo.text;
-		if (tutorial_substate >= 1):
-			hoverinfo2.text += "Z to Undo\n"
-			hoverinfo2.text += "R to Restart\n"
-		if (tutorial_substate >= 2):
-			hoverinfo.text += "Z to Undo\n"
-			hoverinfo.text += "R to Restart\n"
-		if (tutorial_substate >= 3):
-			hoverinfo2.text += "X+Dir to Use Greenality\n"
-			hoverinfo2.text += "Esc to Meta-Restart (refunding Greenalities)\n"
-		if (tutorial_substate >= 4):
-			hoverinfo.text += "X+Dir to Use Greenality\n"
-			hoverinfo.text += "Esc to Meta-Restart (refunding Greenalities)\n"
-		if (tutorial_substate >= 5):
-			hoverinfo2.text += "X to Use Warp Wings\n"
-		if (tutorial_substate >= 6):
-			hoverinfo.text += "X to Use Warp Wings\n"
+	# 0: start of game
+	# 1: just picked up green sword
+	# 2: has used undo or restart
+	# 3: has picked up greenality
+	# 4: has used greenality
+	# 5: has picked up warp wings
+	# 6: has used warp wings
+	hoverinfo.text = "Controls:\n"
+	hoverinfo.text += "WASD to Move\n"
+	hoverinfo.text += "Mouse to Inspect/Move\n"
+	hoverinfo2.text = hoverinfo.text;
+	if (tutorial_substate >= 1):
+		hoverinfo2.text += "Z to Undo\n"
+		hoverinfo2.text += "R to Restart\n"
+	if (tutorial_substate >= 2):
+		hoverinfo.text += "Z to Undo\n"
+		hoverinfo.text += "R to Restart\n"
+	if (tutorial_substate >= 3):
+		hoverinfo2.text += "X+Dir to Use Greenality\n"
+		hoverinfo2.text += "Esc to Meta-Restart (refunding Greenalities)\n"
+	if (tutorial_substate >= 4):
+		hoverinfo.text += "X+Dir to Use Greenality\n"
+		hoverinfo.text += "Esc to Meta-Restart (refunding Greenalities)\n"
+	if (tutorial_substate >= 5):
+		hoverinfo2.text += "X to Use Warp Wings\n"
+	if (tutorial_substate >= 6):
+		hoverinfo.text += "X to Use Warp Wings\n"
 
 func update_hover_info() -> void:
+	# for the first second of the game, don't show anything but the controls
+	if (timer < 1):
+		controls_tutorial();
+		return;
+	
 	var dest_loc = floormap.world_to_map(get_viewport().get_mouse_position());
 	if (dest_loc == last_info_loc):
 		return
@@ -801,6 +810,7 @@ func multiplier_id_to_number(id: int) -> int:
 	return int(string_result);
 
 func _process(delta: float) -> void:
+	timer += delta;
 	if (greenality_timer > 0):
 		greenality_timer -= delta;
 	if (winning_timer > 0):
