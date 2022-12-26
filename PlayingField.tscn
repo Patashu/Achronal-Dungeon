@@ -139,3 +139,17 @@ texture = ExtResource( 10 )
 [node name="Pauseon" type="Sprite" parent="."]
 position = Vector2( 534, 37 )
 texture = SubResource( 1 )
+
+[node name="WarpWingsPreview2" type="Sprite" parent="."]
+
+[node name="WarpWingsPreview1" type="Sprite" parent="."]
+
+[node name="GreenalityPreview1" type="Sprite" parent="."]
+
+[node name="GreenalityPreview2" type="Sprite" parent="."]
+
+[node name="GreenalityPreview3" type="Sprite" parent="."]
+
+[node name="GreenalityPreview4" type="Sprite" parent="."]
+
+[node name="GreenalityPreview5" type="Sprite" parent="."]

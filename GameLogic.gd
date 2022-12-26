@@ -15,6 +15,13 @@ onready var locationinfo : Label = get_node("/root/PlayingField/LocationInfo");
 onready var youareheresign : Label = get_node("/root/PlayingField/YouAreHereSign");
 onready var soundon : Sprite = get_node("/root/PlayingField/Soundon");
 onready var pauseon : Sprite = get_node("/root/PlayingField/Pauseon");
+onready var warpwingspreview1 : Sprite = get_node("/root/PlayingField/WarpWingsPreview1");
+onready var warpwingspreview2 : Sprite = get_node("/root/PlayingField/WarpWingsPreview2");
+onready var greenalitypreview1 : Sprite = get_node("/root/PlayingField/GreenalityPreview1");
+onready var greenalitypreview2 : Sprite = get_node("/root/PlayingField/GreenalityPreview2");
+onready var greenalitypreview3 : Sprite = get_node("/root/PlayingField/GreenalityPreview3");
+onready var greenalitypreview4 : Sprite = get_node("/root/PlayingField/GreenalityPreview4");
+onready var greenalitypreview5 : Sprite = get_node("/root/PlayingField/GreenalityPreview5");
 var hero_loc : Vector2 = Vector2.ZERO;
 var hero_loc_start : Vector2 = Vector2.ZERO;
 var hero_hp : int = 80;
@@ -40,6 +47,7 @@ var inventory_width : int = 7;
 var map_x_max : int = 0; # 31
 var map_y_max : int = 0; # 20
 var action_primed = false;
+var action_primed_time = 0;
 var timer = 0;
 var greenality_timer = 0;
 var winning_timer = 0;
@@ -825,6 +833,59 @@ func multiplier_id_to_number(id: int) -> int:
 	var string_result = multipliermap.tile_set.tile_get_name(id);
 	return int(string_result);
 
+func action_previews_on() -> void:
+	var offset = floormap.cell_size / 2;
+	action_primed_time = timer;
+	if (warpwings > 0):
+		warpwingspreview1.visible = true;
+		warpwingspreview2.visible = true;
+		warpwingspreview1.texture = floormap.tile_set.tile_get_texture(floormap.tile_set.find_tile_by_name("Warpwings"));
+		var tile = "Player";
+		if (green_hero):
+			tile = "Greenplayer";
+		warpwingspreview2.texture = floormap.tile_set.tile_get_texture(floormap.tile_set.find_tile_by_name(tile));
+		warpwingspreview1.position = floormap.map_to_world(hero_loc) + offset;
+		var dest_loc = Vector2(map_x_max - hero_loc.x, map_y_max - hero_loc.y);
+		warpwingspreview2.position = floormap.map_to_world(dest_loc) + offset;
+	if (greenality_avail > 0):
+		greenalitypreview1.visible = true;
+		greenalitypreview1.texture = floormap.tile_set.tile_get_texture(floormap.tile_set.find_tile_by_name("Greenality"));
+		greenalitypreview1.position = floormap.map_to_world(hero_loc) + offset;
+		var previews = [greenalitypreview2, greenalitypreview3, greenalitypreview4, greenalitypreview5];
+		var dirs = [Vector2.LEFT, Vector2.RIGHT, Vector2.DOWN, Vector2.UP];
+		for i in range(4):
+			var preview = previews[i];
+			var dir = dirs[i];
+			var dest_loc = hero_loc + dir;
+			var floor_dest = floormap.get_cellv(dest_loc);
+			if (floor_dest > -1):
+				var dest_name = floormap.tile_set.tile_get_name(floor_dest).to_lower();
+				var green_result = floormap.tile_set.find_tile_by_name("Green" + dest_name);
+				if (green_result > -1):
+					preview.visible = true;
+					preview.texture = floormap.tile_set.tile_get_texture(green_result);
+					preview.position = floormap.map_to_world(hero_loc) + offset + dir*offset*2;
+
+func action_previews_off() -> void:
+	warpwingspreview1.visible = false;
+	warpwingspreview2.visible = false;
+	greenalitypreview1.visible = false;
+	greenalitypreview2.visible = false;
+	greenalitypreview3.visible = false;
+	greenalitypreview4.visible = false;
+	greenalitypreview5.visible = false;
+
+func action_previews_modulate() -> void:
+	if (action_primed):
+		var t = (sin((timer-action_primed_time)*10)+1)/2;
+		warpwingspreview1.modulate = Color(t, t, t, t);
+		warpwingspreview2.modulate = Color(t, t, t, t);
+		greenalitypreview1.modulate = Color(t, t, t, t);
+		greenalitypreview2.modulate = Color(t, t, t, t);
+		greenalitypreview3.modulate = Color(t, t, t, t);
+		greenalitypreview4.modulate = Color(t, t, t, t);
+		greenalitypreview5.modulate = Color(t, t, t, t);
+
 func _process(delta: float) -> void:
 	timer += delta;
 	if (greenality_timer > 0):
@@ -833,6 +894,7 @@ func _process(delta: float) -> void:
 		winning_timer -= delta;
 		var t = min(1, max(0, winning_timer/3));
 		actormap.modulate = Color(t, t, t, t);
+	action_previews_modulate();
 	update_hover_info();
 	if (Input.is_action_just_pressed("mute") or (Input.is_action_just_pressed("ui_accept") and soundon.get_rect().has_point(soundon.to_local(get_viewport().get_mouse_position())))):
 		toggle_mute();
@@ -862,10 +924,12 @@ func _process(delta: float) -> void:
 		
 	if (Input.is_action_just_pressed("action")):
 		action_primed = true;
+		action_previews_on();
 	if (Input.is_action_just_released("action")):
 		if (action_primed):
 			try_warp_wings();
 			action_primed = false;
+			action_previews_off();
 		else:
 			pass
 			# user did a greenality
@@ -884,6 +948,7 @@ func _process(delta: float) -> void:
 		if (action_primed):
 			try_greenality(dir);
 			action_primed = false;
+			action_previews_off();
 		else:
 			if (Input.is_action_pressed("run_modifier")):
 				var is_running = false;
