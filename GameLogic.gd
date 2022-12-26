@@ -202,13 +202,13 @@ func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bo
 		play_sound("bump");
 		return false;
 	if ("wall" in dest_name and !is_running):
-		if (pickaxes > 0):
+		if (pickaxes >= multiplier_val):
 			print_message("You dig through the wall.");
 			var is_green = "green" in dest_name;
 			if (is_green): 
 				play_sound("greeninteract");
-			add_undo_event(["gain_pickaxe", -1], false);
-			pickaxes -= 1;
+			add_undo_event(["gain_pickaxe", -multiplier_val], false);
+			pickaxes -= multiplier_val;
 			add_undo_event(["destroy", dest_loc, dest_name, multiplier_val], is_green);
 			floormap.set_cellv(dest_loc, -1);
 			multipliermap.set_cellv(dest_loc, -1);
@@ -224,20 +224,23 @@ func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bo
 		print_message("The steel wall is impervious to your efforts.");
 		can_move = false;
 	if ("lock" in dest_name and !is_running):
-		if (keys > 0):
+		if (keys >= multiplier_val):
 			print_message("You open the lock.");
 			play_sound("unlock");
 			var is_green = "green" in dest_name;
 			if (is_green): 
 				play_sound("greeninteract");
-			add_undo_event(["gain_key", -1], false);
-			keys -= 1;
+			add_undo_event(["gain_key", -multiplier_val], false);
+			keys -= multiplier_val;
 			add_undo_event(["destroy", dest_loc, dest_name, multiplier_val], is_green);
 			floormap.set_cellv(dest_loc, -1);
 			multipliermap.set_cellv(dest_loc, -1);
 			can_move = true;
 		else:
-			print_message("You need a key to open this lock.");
+			if multiplier_val > 1:
+				print_message("You need " + str(multiplier_val) + " keys to open this lock.");
+			else:
+				print_message("You need a key to open this lock.");
 			can_move = false;
 	if ("magicmirror" in dest_name):
 		print_message("You see your reflection in the mirror!")
@@ -683,7 +686,10 @@ func update_hover_info() -> void:
 		hoverinfo.text += "\nGet the Player here to escape the Achronal Dungeon!";
 	
 	if ("wall" in dest_name):
-		hoverinfo.text += "\nImpervious without a Pickaxe.";
+		if multiplier_val > 1:
+			hoverinfo.text += "\nImpervious without *" + str(multiplier_val) + "* Pickaxes. (Sorry!)";
+		else:
+			hoverinfo.text += "\nImpervious without a Pickaxe.";
 		
 	if ("steel" in dest_name):
 		hoverinfo.text += "\nA wall that can't be Pickaxed. (Sorry!)";
@@ -724,7 +730,10 @@ func update_hover_info() -> void:
 		hoverinfo.text += "\nAllows you to open one lock.";
 		
 	if ("lock" in dest_name):
-		hoverinfo.text += "\nTakes one key to open.";
+		if multiplier_val > 1:
+			hoverinfo.text += "\nTakes *" + str(multiplier_val) + "* keys to open.";
+		else:
+			hoverinfo.text += "\nTakes one key to open.";
 	
 	if (("green" in dest_name) and not ("greenality" in dest_name)):
 		add_green_reminder();
