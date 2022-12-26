@@ -6,7 +6,7 @@ Controls:
 
 * WASD/Arrow keys to move. Hold Shift to run.
 * Mouse over things to learn more about them.
-* z/u/Backspace to undo. Hold shift to undo to the last state change.
+* z/u/Backspace to undo. (Hold shift to undo an individual step.)
 * R to restart (equivalent to holding down undo).
 * Esc to Meta-Restart (refunding all spent Greenalities).
 * X to use Warp Wings.

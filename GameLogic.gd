@@ -8,6 +8,7 @@ onready var inventorymap : TileMap = get_node("/root/PlayingField/InventoryMap")
 onready var heroinfo : Label = get_node("/root/PlayingField/HeroInfo");
 onready var lastmessage : Label = get_node("/root/PlayingField/LastMessage");
 onready var hoverinfo : Label = get_node("/root/PlayingField/HoverInfo");
+onready var hoverinfo2 : Label = get_node("/root/PlayingField/HoverInfo2");
 onready var hoversprite : Sprite = get_node("/root/PlayingField/HoverSprite");
 onready var hoversprite2 : Sprite = get_node("/root/PlayingField/HoverSprite2");
 onready var locationinfo : Label = get_node("/root/PlayingField/LocationInfo");
@@ -16,8 +17,8 @@ onready var soundon : Sprite = get_node("/root/PlayingField/Soundon");
 onready var pauseon : Sprite = get_node("/root/PlayingField/Pauseon");
 var hero_loc : Vector2 = Vector2.ZERO;
 var hero_loc_start : Vector2 = Vector2.ZERO;
-var hero_hp : int = 100;
-var hero_hp_start : int = 100;
+var hero_hp : int = 80;
+var hero_hp_start : int = 80;
 var hero_atk : int = 1;
 var hero_atk_start : int = 1;
 var hero_def : int = 0;
@@ -48,6 +49,7 @@ var speakers = [];
 var muted = false;
 var paused = false;
 var last_info_loc = Vector2(99, 99);
+var tutorial_substate = 0;
 
 func _ready() -> void:
 	# setup hero info
@@ -58,7 +60,8 @@ func _ready() -> void:
 	update_hero_info();
 	calculate_map_size();
 	prepare_audio();
-	print_message("Welcome to the Achronal Dungeon! wasd/arrows to move, z to undo, r to restart, mouse to inspect.")
+	controls_tutorial();
+	print_message("Welcome to the Achronal Dungeon! You won't escape this time.")
 
 func calculate_map_size() -> void:
 	var tiles = floormap.get_used_cells();
@@ -239,9 +242,12 @@ func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bo
 		play_sound("getgreenality");
 	if ("enemy" in dest_name and !is_running):
 		var enemy_stats = monster_helper(dest_name, multiplier_val);
-		if (enemy_stats[2] > hero_hp):
+		if (enemy_stats[2] >= hero_hp):
 			can_move = false;
-			print_message("Fighting this " + name_thing(dest_name, multiplier_val) + " costs " + str(enemy_stats[2]) + " HP.");
+			if (tutorial_substate == 1):
+				print_message("You're not strong enough to win this fight without undoing (Z) or restarting (R)!");
+			else:
+				print_message("Fighting this " + name_thing(dest_name, multiplier_val) + " costs " + str(enemy_stats[2]) + " HP.");
 		else:
 			can_move = true;
 			consume_item(dest_loc);
@@ -251,6 +257,7 @@ func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bo
 		win(dest_loc);
 	if (can_move):
 		if (warp):
+			tutorial_substate = max(tutorial_substate, 6);
 			add_undo_event(["gain_warpwings", -1], false);
 			warpwings -= 1;
 			print_message("Warped!");
@@ -302,6 +309,7 @@ func consume_greenality(dest_loc: Vector2) -> void:
 	greenality_max += 1;
 	greenality_timer += 1;
 	print_message("Use X+dir to turn something GREEN forever. Meta restart with ESC to refund Greenalities.");
+	tutorial_substate = max(tutorial_substate, 3);
 		
 func consume_item(dest_loc: Vector2) -> void:
 	var multiplier_dest = multipliermap.get_cellv(dest_loc);
@@ -339,6 +347,7 @@ func consume_item(dest_loc: Vector2) -> void:
 		add_undo_event(["gain_warpwings", multiplier_val], is_green);
 		warpwings += multiplier_val;
 		message = "You take the " + name_thing(dest_name, multiplier_val) + "! X to use.";
+		tutorial_substate = max(tutorial_substate, 5);
 	elif ("key" in dest_name):
 		add_undo_event(["gain_key", multiplier_val], is_green);
 		keys += multiplier_val;
@@ -362,6 +371,7 @@ func consume_item(dest_loc: Vector2) -> void:
 		message += ".";
 	if (is_green and !green_tutorial_message_seen):
 		green_tutorial_message_seen = true;
+		tutorial_substate = max(tutorial_substate, 1);
 		message += " GREEN changes persist through undo (z) and restart (r)."
 		pass
 	print_message(message);
@@ -453,6 +463,7 @@ func try_greenality(dir: Vector2) -> void:
 	hero_keypresses += 1;
 	update_hero_info();
 	play_sound("usegreenality");
+	tutorial_substate = max(tutorial_substate, 4);
 
 func add_undo_event(event: Array, is_green = false) -> void:
 	if (!is_green):
@@ -566,6 +577,36 @@ func undo_one_event(event: Array) -> bool:
 		keys -= event[1];
 	return stateful;
 
+func controls_tutorial() -> void:
+	if (hoverinfo.text == ""):
+		# 0: start of game
+		# 1: just picked up green sword
+		# 2: has used undo or restart
+		# 3: has picked up greenality
+		# 4: has used greenality
+		# 5: has picked up warp wings
+		# 6: has used warp wings
+		hoverinfo.text += "Controls:\n"
+		hoverinfo.text += "WASD to Move\n"
+		hoverinfo.text += "Mouse to Inspect/Move\n"
+		hoverinfo2.text = hoverinfo.text;
+		if (tutorial_substate >= 1):
+			hoverinfo2.text += "Z to Undo\n"
+			hoverinfo2.text += "R to Restart\n"
+		if (tutorial_substate >= 2):
+			hoverinfo.text += "Z to Undo\n"
+			hoverinfo.text += "R to Restart\n"
+		if (tutorial_substate >= 3):
+			hoverinfo2.text += "X+Dir to Use Greenality\n"
+			hoverinfo2.text += "Esc to Meta-Restart (refunding Greenalities)\n"
+		if (tutorial_substate >= 4):
+			hoverinfo.text += "X+Dir to Use Greenality\n"
+			hoverinfo.text += "Esc to Meta-Restart (refunding Greenalities)\n"
+		if (tutorial_substate >= 5):
+			hoverinfo2.text += "X to Use Warp Wings\n"
+		if (tutorial_substate >= 6):
+			hoverinfo.text += "X to Use Warp Wings\n"
+
 func update_hover_info() -> void:
 	var dest_loc = floormap.world_to_map(get_viewport().get_mouse_position());
 	if (dest_loc == last_info_loc):
@@ -583,6 +624,7 @@ func update_hover_info() -> void:
 	hoversprite2.texture = null;
 	hoversprite.texture = null;
 	hoverinfo.text = "";
+	hoverinfo2.text = "";
 	
 	if !(dest_loc.x < 0 || dest_loc.x > map_x_max || dest_loc.y < 0 || dest_loc.y > map_y_max):
 		locationinfo.text = "(" + str(dest_loc.x) + ", " + str(dest_loc.y) + ")";
@@ -595,6 +637,7 @@ func update_hover_info() -> void:
 	if (dest_to_use >= 0):
 		hoversprite.texture = floormap.tile_set.tile_get_texture(dest_to_use);
 	else:
+		controls_tutorial();
 		return;
 	
 	# this is all gross. I guess I 'should' use json and helper functions and whatnot.
@@ -607,7 +650,7 @@ func update_hover_info() -> void:
 	hoverinfo.text = name_thing(dest_name, multiplier_val);
 	
 	if ("player" in dest_name):
-		hoverinfo.text += "\nIt's you! wasd/arrows to move, z to undo, r to restart.";
+		hoverinfo.text += "\nIt's you!";
 		
 	if ("win" == dest_name):
 		hoverinfo.text += "\nGet the Player here to escape the Achronal Dungeon!";
@@ -773,7 +816,8 @@ func _process(delta: float) -> void:
 		print_message("DEBUG: Wallhack toggled.")
 		wallhack = !wallhack;
 	if (Input.is_action_just_pressed("undo")):
-		if (Input.is_action_pressed("run_modifier")):
+		tutorial_substate = max(tutorial_substate, 2);
+		if (!Input.is_action_pressed("run_modifier")):
 			var stateful = false;
 			var is_silent = false;
 			while !stateful:
@@ -782,8 +826,10 @@ func _process(delta: float) -> void:
 		else:
 			undo();
 	if (Input.is_action_just_pressed("restart")):
+		tutorial_substate = max(tutorial_substate, 2);
 		restart();
 	if (Input.is_action_just_pressed("meta_restart")):
+		tutorial_substate = max(tutorial_substate, 4);
 		meta_restart();
 	if (has_won):
 		return;
