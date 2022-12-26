@@ -849,6 +849,9 @@ func try_pathfind() -> void:
 	if (dest_loc.x < 0 || dest_loc.x > map_x_max || dest_loc.y < 0 || dest_loc.y > map_y_max):
 		return
 	astar.clear();
+	# whee temporarily pretend the map is larger hack
+	map_x_max = map_x_max + 1;
+	map_y_max = map_y_max + 1;
 	for j in range(map_y_max):
 		for i in range(map_x_max):
 			var pos = Vector2(i, j);
@@ -873,6 +876,8 @@ func try_pathfind() -> void:
 	else:
 		print_message("Couldn't pathfind to there.");
 		play_sound("bump");
+	map_x_max = map_x_max - 1;
+	map_y_max = map_y_max - 1;
 
 func action_previews_on() -> void:
 	var offset = floormap.cell_size / 2;
