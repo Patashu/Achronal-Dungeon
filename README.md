@@ -16,3 +16,7 @@ Controls:
 * (DEBUG BUILDS ONLY) ` to toggle Wallhack.
 
 If you have fully completed the game, you can compete by optimising for HP or turn count.
+
+Video walkthrough (spoilers, obviously): https://www.youtube.com/watch?v=kRPn0sJHqZw
+
+The amazing graphics are by RoxxyRobofox#6767!
