@@ -861,7 +861,7 @@ func try_pathfind() -> void:
 		for i in range(map_x_max):
 			var pos = Vector2(i, j);
 			var floor_pos = floormap.get_cellv(pos);
-			if (floor_pos == -1 or pos == dest_loc):
+			if (floor_pos == -1 or pos == dest_loc or pos == hero_loc):
 				astar.add_point(i + j*map_x_max, pos);
 				# connect to the points 1 west and 1 north of us, if relevant
 				if astar.has_point((i-1) + j*map_x_max):
