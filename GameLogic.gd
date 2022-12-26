@@ -4,6 +4,7 @@ class_name GameLogic
 onready var multipliermap : TileMap = get_node("/root/PlayingField/MultiplierMap");
 onready var actormap : TileMap = get_node("/root/PlayingField/ActorMap");
 onready var floormap : TileMap = get_node("/root/PlayingField/FloorMap");
+onready var residuemap : TileMap = get_node("/root/PlayingField/ResidueMap");
 onready var inventorymap : TileMap = get_node("/root/PlayingField/InventoryMap");
 onready var heroinfo : Label = get_node("/root/PlayingField/HeroInfo");
 onready var lastmessage : Label = get_node("/root/PlayingField/LastMessage");
@@ -497,12 +498,15 @@ func add_undo_event(event: Array, is_green = false) -> void:
 			undo_buffer.append([]);
 		undo_buffer[hero_turn].push_front(event);
 	else:
+		if (event[0] == "destroy"):
+			residuemap.set_cellv(event[1], residuemap.tile_set.find_tile_by_name("Residue"));
 		meta_undo_buffer.push_front(event);
 
 func print_message(message: String)-> void:
 	lastmessage.text = message;
 
 func meta_restart() -> void:
+	residuemap.clear();
 	restart(true);
 	# fine as long as doing undo and meta undo events in arbitrary order commutes.
 	# might get weird with Green Player, I'll have to test some things or maybe just hard code it.
