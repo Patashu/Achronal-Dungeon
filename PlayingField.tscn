@@ -74,6 +74,17 @@ custom_fonts/font = ExtResource( 6 )
 text = "(99, 99)"
 autowrap = true
 
+[node name="YouAreHereSign" type="Label" parent="."]
+margin_left = 35.0
+margin_top = 3.0
+margin_right = 134.0
+margin_bottom = 79.0
+custom_colors/font_color = Color( 0.988235, 0.921569, 0.713726, 1 )
+custom_fonts/font = ExtResource( 6 )
+text = "   This is you!
+         v v v"
+autowrap = true
+
 [node name="HoverInfo" type="Label" parent="."]
 margin_left = 418.0
 margin_top = 125.0

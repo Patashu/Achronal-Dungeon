@@ -11,6 +11,7 @@ onready var hoverinfo : Label = get_node("/root/PlayingField/HoverInfo");
 onready var hoversprite : Sprite = get_node("/root/PlayingField/HoverSprite");
 onready var hoversprite2 : Sprite = get_node("/root/PlayingField/HoverSprite2");
 onready var locationinfo : Label = get_node("/root/PlayingField/LocationInfo");
+onready var youareheresign : Label = get_node("/root/PlayingField/YouAreHereSign");
 onready var soundon : Sprite = get_node("/root/PlayingField/Soundon");
 onready var pauseon : Sprite = get_node("/root/PlayingField/Pauseon");
 var hero_loc : Vector2 = Vector2.ZERO;
@@ -807,6 +808,7 @@ func _process(delta: float) -> void:
 		dir = Vector2.DOWN;
 		
 	if dir != Vector2.ZERO:
+		youareheresign.visible = false;
 		if (action_primed):
 			try_greenality(dir);
 			action_primed = false;
