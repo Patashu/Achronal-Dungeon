@@ -684,6 +684,8 @@ func update_hover_info() -> void:
 		hoverinfo.text += "\nHP: " + str(enemy_stats[0]);
 		hoverinfo.text += "\nATK: " + str(enemy_stats[1]);
 		hoverinfo.text += "\nYou would lose " + str(enemy_stats[2]) + " HP killing this.";
+		if (enemy_stats[3] > 0):
+			hoverinfo.text += "\n+" + str(enemy_stats[3]) + " ATK or +1 DEF would help!";
 		
 	if ("greenality" in dest_name):
 		hoverinfo.text += "\nAllows you to permanently make something GREEN.";
@@ -778,7 +780,7 @@ func add_green_reminder() -> void:
 	hoverinfo.text += "\n\nInteracting with a Green thing persists through UNDO (z) and RESTART (r)."
 
 func monster_helper(name: String, multiplier_val: int) -> Array:
-	var result = [0, 0, 0]
+	var result = [0, 0, 0, 0] # the fourth number is 'atk required to take less damage'
 	if "slime" in name:
 		result[0] = 10*multiplier_val;
 		result[1] = 1*multiplier_val;
@@ -800,7 +802,21 @@ func monster_helper(name: String, multiplier_val: int) -> Array:
 		result[2] = INF;
 		return result;
 	# fight time!
-	result[2] = max(0, (result[1]-hero_def)*(ceil(float(result[0])/float(hero_atk))-1));
+	var fractional_attacks = float(result[0])/float(hero_atk);
+	var rounded_attacks = ceil(fractional_attacks);
+	var hero_injury_per_counterattack = result[1]-hero_def;
+	result[2] = max(0, (hero_injury_per_counterattack)*(rounded_attacks-1));
+	if (result[2] > 0):
+		# calculate next atk threshold
+		# TODO: probably a one liner to do this but no need
+		for i in range (100):
+			var try_next_atk = hero_atk + i;
+			var try_frac_attack = float(result[0])/float(try_next_atk);
+			var try_round_attack = ceil(try_frac_attack);
+			if (try_round_attack < rounded_attacks):
+				result[3] = i;
+				break;
+		pass
 	return result;
 
 func multiplier_id_to_number(id: int) -> int:
