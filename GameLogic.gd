@@ -838,6 +838,12 @@ func multiplier_id_to_number(id: int) -> int:
 	var string_result = multipliermap.tile_set.tile_get_name(id);
 	return int(string_result);
 
+func try_greenality_mouse() -> void:
+	var dest_loc = floormap.world_to_map(get_viewport().get_mouse_position());
+	var dir = dest_loc - hero_loc;
+	if (dir == Vector2.UP || dir == Vector2.DOWN || dir == Vector2.LEFT || dir == Vector2.RIGHT):
+		try_greenality(dir);
+
 func try_pathfind() -> void:
 	var dest_loc = floormap.world_to_map(get_viewport().get_mouse_position());
 	if (dest_loc.x < 0 || dest_loc.x > map_x_max || dest_loc.y < 0 || dest_loc.y > map_y_max):
@@ -959,7 +965,12 @@ func _process(delta: float) -> void:
 		return;
 		
 	if (Input.is_action_just_pressed("pathfind_to")):
-		try_pathfind();
+		if (action_primed):
+			try_greenality_mouse();
+			action_primed = false;
+			action_previews_off();
+		else:
+			try_pathfind();
 		
 	if (Input.is_action_just_pressed("action")):
 		action_primed = true;
