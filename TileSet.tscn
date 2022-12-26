@@ -1,4 +1,4 @@
-[gd_scene load_steps=113 format=2]
+[gd_scene load_steps=114 format=2]
 
 [ext_resource path="res://assets/greensword.png" type="Texture" id=1]
 [ext_resource path="res://assets/player.png" type="Texture" id=2]
@@ -87,6 +87,7 @@
 [ext_resource path="res://assets/greenplayer2.png" type="Texture" id=85]
 [ext_resource path="res://assets/playerWIN.png" type="Texture" id=86]
 [ext_resource path="res://assets/greenplayerWIN.png" type="Texture" id=87]
+[ext_resource path="res://assets/steel.png" type="Texture" id=88]
 
 [sub_resource type="AnimatedTexture" id=6]
 frames = 2
@@ -513,3 +514,7 @@ texture = ExtResource( 86 )
 [node name="GreenplayerWin" type="Sprite" parent="."]
 position = Vector2( 47, 196 )
 texture = ExtResource( 87 )
+
+[node name="Steel" type="Sprite" parent="."]
+position = Vector2( 2, 221 )
+texture = ExtResource( 88 )

@@ -200,6 +200,9 @@ func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bo
 		else:
 			print_message("You bump into the wall.");
 			can_move = false;
+	if ("steel" in dest_name and !is_running):
+		print_message("The steel wall is impervious to your efforts.");
+		can_move = false;
 	if ("lock" in dest_name and !is_running):
 		if (keys > 0):
 			print_message("You open the lock.");
@@ -410,6 +413,10 @@ func try_greenality(dir: Vector2) -> void:
 	if ("greenality" in dest_name):
 		print_message("Sorry, that would tear a hole in spacetime, consuming you in the process.");
 		return;
+		
+	if ("steel" in dest_name):
+		print_message("You can't turn steel walls GREEN.");
+		return;
 	
 	var is_green = "green" in dest_name;
 	if (is_green):
@@ -607,6 +614,9 @@ func update_hover_info() -> void:
 	if ("wall" in dest_name):
 		hoverinfo.text += "\nImpervious without a Pickaxe.";
 		
+	if ("steel" in dest_name):
+		hoverinfo.text += "\nA wall that can't be Pickaxed. (Sorry!)";
+		
 	if ("potion" in dest_name):
 		hoverinfo.text += "\nIncreases your HP by " + str(multiplier_val) + ".";
 		
@@ -660,6 +670,9 @@ func name_thing(dest_name: String, multiplier_val: int) -> String:
 		
 	if ("wall" in dest_name):
 		result += "Wall";
+		
+	if ("steel" in dest_name):
+		result += "Steel Wall";
 		
 	if ("potion" in dest_name):
 		result += "Potion";
