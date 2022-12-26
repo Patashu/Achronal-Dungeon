@@ -453,18 +453,23 @@ func try_greenality(dir: Vector2) -> void:
 		return;
 	
 	if ("magicmirror" in dest_name):
-		print_message("The GREEN bounces off the Magic Mirror and affects you!")
-		add_undo_event(["dummy"], false);
-		add_undo_event(["green_player"], true);
-		actormap.set_cellv(hero_loc, actormap.tile_set.find_tile_by_name("Greenplayer"));
-		green_hero = true;
-		greenality_timer += 1;
-		greenality_avail -= 1;
-		hero_turn += 1;
-		hero_keypresses += 1;
-		update_hero_info();
-		play_sound("greenplayer");
-		return;
+		if (green_hero):
+			print_message("You FEAR what might happen if you become any more GREEN...");
+			return;
+		else:
+			print_message("The GREEN bounces off the Magic Mirror and affects you!")
+			add_undo_event(["dummy"], false);
+			add_undo_event(["green_player"], true);
+			actormap.set_cellv(hero_loc, actormap.tile_set.find_tile_by_name("Greenplayer"));
+			green_hero = true;
+			greenality_timer += 1;
+			greenality_avail -= 1;
+			hero_turn += 1;
+			hero_keypresses += 1;
+			update_hero_info();
+			play_sound("greenplayer");
+			tutorial_substate = max(tutorial_substate, 4);
+			return;
 		
 	if ("win" == dest_name):
 		print_message("You can't make the Goal GREEN. (Good job taking a Greenality to it though!)")
@@ -906,7 +911,7 @@ func action_previews_on() -> void:
 			var floor_dest = floormap.get_cellv(dest_loc);
 			if (floor_dest > -1):
 				var dest_name = floormap.tile_set.tile_get_name(floor_dest).to_lower();
-				if (dest_name == "magicmirror"):
+				if (dest_name == "magicmirror" and !green_hero):
 					dest_name = "player";
 				var green_result = floormap.tile_set.find_tile_by_name("Green" + dest_name);
 				if (green_result > -1):
