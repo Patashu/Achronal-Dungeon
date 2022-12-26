@@ -60,6 +60,7 @@ var paused = false;
 var last_info_loc = Vector2(99, 99);
 var tutorial_substate = 0;
 var astar := AStar2D.new()
+var step_sfx_played_this_frame = false;
 
 func _ready() -> void:
 	# setup hero info
@@ -179,6 +180,7 @@ func toggle_pause() -> void:
 			animtex.fps = fps;
 
 func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bool:
+	youareheresign.visible = false;
 	# check multiplier, actor and floor at destination
 	# note: for now I'm putting only the player in the actor layer...
 	# and ONLY because the player might overlap things (most notably the goal)
@@ -277,7 +279,9 @@ func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bo
 			print_message("Warped!");
 			play_sound("fly");
 		elif (!is_running):
-			play_sound("step");
+			if (!step_sfx_played_this_frame):
+				play_sound("step");
+				step_sfx_played_this_frame = true;
 		move_hero_commit(dir);
 	elif (!is_running):
 		play_sound("bump");
@@ -600,8 +604,8 @@ func controls_tutorial() -> void:
 	# 5: has picked up warp wings
 	# 6: has used warp wings
 	hoverinfo.text = "Controls:\n"
-	hoverinfo.text += "WASD to Move\n"
-	hoverinfo.text += "Mouse to Inspect/Move\n"
+	hoverinfo.text += "WASD or Mouse to Move\n"
+	hoverinfo.text += "Mouse Over to Inspect\n"
 	hoverinfo2.text = hoverinfo.text;
 	if (tutorial_substate >= 1):
 		hoverinfo2.text += "Z to Undo\n"
@@ -925,6 +929,7 @@ func _process(delta: float) -> void:
 		winning_timer -= delta;
 		var t = min(1, max(0, winning_timer/3));
 		actormap.modulate = Color(t, t, t, t);
+	step_sfx_played_this_frame = false;
 	action_previews_modulate();
 	update_hover_info();
 	if (Input.is_action_just_pressed("mute") or (Input.is_action_just_pressed("ui_accept") and soundon.get_rect().has_point(soundon.to_local(get_viewport().get_mouse_position())))):
@@ -978,7 +983,6 @@ func _process(delta: float) -> void:
 		dir = Vector2.DOWN;
 		
 	if dir != Vector2.ZERO:
-		youareheresign.visible = false;
 		if (action_primed):
 			try_greenality(dir);
 			action_primed = false;
