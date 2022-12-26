@@ -59,6 +59,7 @@ var muted = false;
 var paused = false;
 var last_info_loc = Vector2(99, 99);
 var tutorial_substate = 0;
+var astar := AStar2D.new()
 
 func _ready() -> void:
 	# setup hero info
@@ -833,6 +834,36 @@ func multiplier_id_to_number(id: int) -> int:
 	var string_result = multipliermap.tile_set.tile_get_name(id);
 	return int(string_result);
 
+func try_pathfind() -> void:
+	var dest_loc = floormap.world_to_map(get_viewport().get_mouse_position());
+	if (dest_loc.x < 0 || dest_loc.x > map_x_max || dest_loc.y < 0 || dest_loc.y > map_y_max):
+		return
+	astar.clear();
+	for j in range(map_y_max):
+		for i in range(map_x_max):
+			var pos = Vector2(i, j);
+			var floor_pos = floormap.get_cellv(pos);
+			if (floor_pos == -1 or pos == dest_loc):
+				astar.add_point(i + j*map_x_max, pos);
+				# connect to the points 1 west and 1 north of us, if relevant
+				if astar.has_point((i-1) + j*map_x_max):
+					astar.connect_points(i + j*map_x_max, (i-1) + j*map_x_max);
+				if astar.has_point(i + (j-1)*map_x_max):
+					astar.connect_points(i + j*map_x_max, i + (j-1)*map_x_max);
+	var hero_id = hero_loc.x + hero_loc.y*map_x_max;
+	var dest_id = dest_loc.x + dest_loc.y*map_x_max;
+	var id_array = astar.get_id_path(hero_id, dest_id);
+	if (id_array.size() > 0):
+		for ix in range(id_array.size()):
+			var id = id_array[ix];
+			dest_loc = Vector2(id % map_x_max, floor(id / map_x_max));
+			var dir = dest_loc - hero_loc;
+			if (dir != Vector2.ZERO):
+				move_hero(dir, false, false);
+	else:
+		print_message("Couldn't pathfind to there.");
+		play_sound("bump");
+
 func action_previews_on() -> void:
 	var offset = floormap.cell_size / 2;
 	action_primed_time = timer;
@@ -921,6 +952,9 @@ func _process(delta: float) -> void:
 		meta_restart();
 	if (has_won):
 		return;
+		
+	if (Input.is_action_just_pressed("pathfind_to")):
+		try_pathfind();
 		
 	if (Input.is_action_just_pressed("action")):
 		action_primed = true;

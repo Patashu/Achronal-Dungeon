@@ -3,14 +3,17 @@ Achronal Dungeon is a game made for the Thinky Puzzle Games Confounding Calendar
 Play here: https://patashu.itch.io/achronal-dungeon
 
 Controls:
+* WASD or Mouse to Move
+* Mouse Over to Inspect
+* Z to Undo
+* R to Restart
+* X+Dir to Use Greenality
+* Esc to Meta-Restart (refunding Greenalities)
+* X to Use Warp Wings
 
-* WASD/Arrow keys to move. Hold Shift to run.
-* Mouse over things to learn more about them.
-* z/u/Backspace to undo. (Hold shift to undo an individual step.)
-* R to restart (equivalent to holding down undo).
-* Esc to Meta-Restart (refunding all spent Greenalities).
-* X to use Warp Wings.
-* X+Dir to use Greenality.
+Extra controls;
+* Shift+dir to run.
+* Shift+undo to undo just an individual step.
 * M or click on the note icon in the top right corner to toggle SFX.
 * P or click on the slime icon in the top right corner to toggle animations.
 * (DEBUG BUILDS ONLY) ` to toggle Wallhack.
