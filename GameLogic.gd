@@ -280,7 +280,8 @@ func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bo
 			tutorial_substate = max(tutorial_substate, 6);
 			add_undo_event(["gain_warpwings", -1], false);
 			warpwings -= 1;
-			print_message("Warped!");
+			if (!has_won):
+				print_message("Warped!");
 			play_sound("fly");
 		elif (!is_running):
 			if (!step_sfx_played_this_frame):
