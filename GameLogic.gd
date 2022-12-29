@@ -325,7 +325,7 @@ func win(dest_loc: Vector2) -> void:
 func check_secret_endings() -> void:
 	if (hero_turn < 1):
 		secret_endings["TELEPORT"] = true;
-	if (hero_turn < 70 and !green_hero):
+	if (hero_turn < 60 and !green_hero):
 		secret_endings["SPEEDRUN"] = true;
 	if (hero_keypresses < 213):
 		secret_endings["TIMERUN"] = true;
@@ -501,7 +501,7 @@ func try_greenality(dir: Vector2) -> void:
 			return;
 		
 	if ("win" == dest_name):
-		print_message("You can't make the Goal GREEN. (Good job taking a Greenality to it though!)")
+		print_message("You can't make the Goal GREEN. (You CAN get a secret ending though!)")
 		return;
 	
 	# Everything else? Fair game, and should be the same code.
