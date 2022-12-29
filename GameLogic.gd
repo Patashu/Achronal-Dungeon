@@ -323,11 +323,11 @@ func win(dest_loc: Vector2) -> void:
 	check_secret_endings();
 	
 func check_secret_endings() -> void:
-	if (hero_turn <= 1):
+	if (hero_turn < 1):
 		secret_endings["TELEPORT"] = true;
-	if (hero_turn <= 70 and !green_hero):
+	if (hero_turn < 70 and !green_hero):
 		secret_endings["SPEEDRUN"] = true;
-	if (hero_keypresses <= 213):
+	if (hero_keypresses < 213):
 		secret_endings["TIMERUN"] = true;
 	var greenality_used = greenality_max - greenality_avail;
 	if (greenality_used <= 2):
