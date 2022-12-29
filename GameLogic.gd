@@ -62,6 +62,7 @@ var last_info_loc = Vector2(99, 99);
 var tutorial_substate = 0;
 var astar := AStar2D.new()
 var step_sfx_played_this_frame = false;
+var secret_endings = {};
 
 func _ready() -> void:
 	# setup hero info
@@ -319,6 +320,29 @@ func win(dest_loc: Vector2) -> void:
 	print_message(message)
 	has_won = true;
 	add_undo_event(["win"]);
+	check_secret_endings();
+	
+func check_secret_endings() -> void:
+	if (hero_turn <= 1):
+		secret_endings["TELEPORT"] = true;
+	if (hero_turn <= 70 and !green_hero):
+		secret_endings["SPEEDRUN"] = true;
+	if (hero_keypresses <= 213):
+		secret_endings["TIMERUN"] = true;
+	var greenality_used = greenality_max - greenality_avail;
+	if (greenality_used <= 2):
+		secret_endings["SMUGGLER"] = true;
+	if (hero_hp <= 1):
+		secret_endings["OUCH"] = true;
+	var tiles = floormap.get_used_cells();
+	var found_enemy = false;
+	for tile in tiles:
+		var name = floormap.tile_set.tile_get_name(floormap.get_cellv(tile)).to_lower();
+		if ("enemy" in name):
+			found_enemy = true;
+			break;
+	if (!found_enemy):
+		secret_endings["CATACLYSM"] = true;
 		
 func consume_greenality(dest_loc: Vector2) -> void:
 	var multiplier_dest = multipliermap.get_cellv(dest_loc);
@@ -559,6 +583,7 @@ func undo_one_event(event: Array) -> bool:
 			play_sound("greensmall");
 	elif (event[0] == "win"):
 		has_won = false;
+		secret_endings.clear();
 		winning_timer = 0;
 		actormap.modulate = Color(1, 1, 1, 1);
 		if (green_hero):
@@ -639,6 +664,18 @@ func controls_tutorial() -> void:
 	if (tutorial_substate >= 6):
 		hoverinfo.text += "X to Use Warp Wings\n"
 
+func credits_and_secret_endings() -> void:
+	hoverinfo.text = "CREDITS:\n\nPatashu: Concept, programming, level design, SFX\n\nArt: RoxxyRobofox#6767\n\nPlaytesters: VoxSomniator"
+	hoverinfo2.text = "\n\n\n\n\n\n\n\n\n\n\n\n";
+	var first_printed = false;
+	for secret in secret_endings.keys():
+		if (!first_printed):
+			hoverinfo2.text += "SECRET ENDING: "
+			first_printed = true;
+		else:
+			hoverinfo2.text += ", "
+		hoverinfo2.text += secret;
+
 func update_hover_info() -> void:
 	# for the first second of the game, don't show anything but the controls
 	if (timer < 1):
@@ -669,7 +706,7 @@ func update_hover_info() -> void:
 		locationinfo.text = ""
 	
 	if (has_won):
-		hoverinfo.text = "CREDITS:\n\nPatashu: Concept, programming, level design, SFX\n\nArt: RoxxyRobofox#6767\n\nPlaytesters: VoxSomniator"
+		credits_and_secret_endings();
 	
 	if (dest_to_use >= 0):
 		hoversprite.texture = floormap.tile_set.tile_get_texture(dest_to_use);
