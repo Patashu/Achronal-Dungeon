@@ -92,8 +92,8 @@ func update_hero_info() -> void:
 	else:
 		heroinfo.text += "Turn: " + str(hero_turn) + "\r\n";
 	update_inventory();
-	# unless the player is mousing over a monster, 'fall off' the hover info to the controls
-	if (!("would lose" in hoverinfo.text)):
+	# unless the player is mousing over a monster or winning, 'fall off' the hover info to the controls
+	if (!has_won and !("would lose" in hoverinfo.text)):
 		controls_tutorial();
 	else:
 		last_info_loc = Vector2(99, 99); # to un-cache it
@@ -609,6 +609,8 @@ func undo_one_event(event: Array) -> bool:
 	return stateful;
 
 func controls_tutorial() -> void:
+	if (has_won):
+		return;
 	# 0: start of game
 	# 1: just picked up green sword
 	# 2: has used undo or restart
