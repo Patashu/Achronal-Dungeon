@@ -63,6 +63,8 @@ var tutorial_substate = 0;
 var astar := AStar2D.new()
 var step_sfx_played_this_frame = false;
 var secret_endings = {};
+var ever_used_warp_wings = false;
+var pickaxe_this_meta_restart = false;
 
 func _ready() -> void:
 	# setup hero info
@@ -206,6 +208,7 @@ func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bo
 	if ("wall" in dest_name and !is_running):
 		if (pickaxes >= multiplier_val):
 			print_message("You dig through the wall.");
+			pickaxe_this_meta_restart = true;
 			var is_green = "green" in dest_name;
 			if (is_green): 
 				play_sound("greeninteract");
@@ -281,6 +284,7 @@ func move_hero(dir: Vector2, warp: bool = false, is_running: bool = false) -> bo
 			tutorial_substate = max(tutorial_substate, 6);
 			add_undo_event(["gain_warpwings", -1], false);
 			warpwings -= 1;
+			ever_used_warp_wings = true;
 			if (!has_won):
 				print_message("Warped!");
 			play_sound("fly");
@@ -340,6 +344,10 @@ func check_secret_endings() -> void:
 		secret_endings["MAX ATK"] = true;
 	if (hero_def >= 77 and !green_hero):
 		secret_endings["MAX DEF"] = true;
+	if (!ever_used_warp_wings):
+		secret_endings["GROUNDED"] = true;
+	if (!pickaxe_this_meta_restart):
+		secret_endings["INBOUNDS"] = true;
 	var tiles = floormap.get_used_cells();
 	var found_enemy = false;
 	for tile in tiles:
@@ -538,6 +546,7 @@ func print_message(message: String)-> void:
 
 func meta_restart() -> void:
 	residuemap.clear();
+	pickaxe_this_meta_restart = false;
 	restart(true);
 	# fine as long as doing undo and meta undo events in arbitrary order commutes.
 	# might get weird with Green Player, I'll have to test some things or maybe just hard code it.
