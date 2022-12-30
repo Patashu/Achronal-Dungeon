@@ -334,6 +334,12 @@ func check_secret_endings() -> void:
 		secret_endings["SMUGGLER"] = true;
 	if (hero_hp <= 1):
 		secret_endings["OUCH"] = true;
+	if (hero_hp >= 1948 and !green_hero):
+		secret_endings["MAX HP"] = true;
+	if (hero_atk >= 96 and !green_hero):
+		secret_endings["MAX ATK"] = true;
+	if (hero_def >= 77 and !green_hero):
+		secret_endings["MAX DEF"] = true;
 	var tiles = floormap.get_used_cells();
 	var found_enemy = false;
 	for tile in tiles:
