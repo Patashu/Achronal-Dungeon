@@ -407,7 +407,7 @@ func load_game() -> void:
 	for i in range(amount):
 		consume_greenality(Vector2(save_game.get_64(), save_game.get_64()));
 	ever_used_warp_wings = true; # TODO: or just save it
-	if greenality_timer > 1:
+	if greenality_timer >= 1:
 		greenality_timer = 1;
 		play_sound("getgreenality");
 	update_hero_info();
