@@ -13,9 +13,15 @@ _global_script_classes=[ {
 "class": "GameLogic",
 "language": "GDScript",
 "path": "res://GameLogic.gd"
+}, {
+"base": "Node2D",
+"class": "LoadSavePrompt",
+"language": "GDScript",
+"path": "res://LoadSavePrompt.gd"
 } ]
 _global_script_class_icons={
-"GameLogic": ""
+"GameLogic": "",
+"LoadSavePrompt": ""
 }
 
 [application]

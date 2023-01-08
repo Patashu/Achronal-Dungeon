@@ -1,6 +1,7 @@
 extends Node
 class_name GameLogic
 
+onready var playingfield : Node2D = get_node("/root/PlayingField");
 onready var multipliermap : TileMap = get_node("/root/PlayingField/MultiplierMap");
 onready var actormap : TileMap = get_node("/root/PlayingField/ActorMap");
 onready var floormap : TileMap = get_node("/root/PlayingField/FloorMap");
@@ -65,6 +66,7 @@ var step_sfx_played_this_frame = false;
 var secret_endings = {};
 var ever_used_warp_wings = false;
 var pickaxe_this_meta_restart = false;
+var greenalities_acquired = [];
 
 func _ready() -> void:
 	# setup hero info
@@ -76,6 +78,13 @@ func _ready() -> void:
 	calculate_map_size();
 	prepare_audio();
 	controls_tutorial();
+	var how_many = how_many_greenalities_saved();
+	if (how_many > 0):
+		var loadsaveprompt = preload("res://LoadSavePrompt.tscn").instance()
+		self.add_child(loadsaveprompt);
+		loadsaveprompt.position = Vector2(112, 130);
+		loadsaveprompt.amount = how_many;
+		loadsaveprompt.connect("confirm_pressed", self, "load_game");
 	print_message("Welcome to the Achronal Dungeon! You won't escape this time.")
 
 func calculate_map_size() -> void:
@@ -371,6 +380,37 @@ func consume_greenality(dest_loc: Vector2) -> void:
 	greenality_timer += 1;
 	print_message("Use X+dir to turn something GREEN forever. Meta restart with ESC to refund Greenalities.");
 	tutorial_substate = max(tutorial_substate, 3);
+	greenalities_acquired.append(dest_loc);
+	if (how_many_greenalities_saved() < greenalities_acquired.size()):
+		save_game();
+		
+func save_game() -> void:
+	var save_game = File.new()
+	save_game.open("user://achronaldungeon.sav", File.WRITE)
+	save_game.store_64(tutorial_substate);
+	save_game.store_64(greenalities_acquired.size());
+	for i in range(greenalities_acquired.size()):
+		save_game.store_64(greenalities_acquired[i].x);
+		save_game.store_64(greenalities_acquired[i].y);
+	
+func how_many_greenalities_saved() -> int:
+	var save_game = File.new()
+	save_game.open("user://achronaldungeon.sav", File.READ)
+	var dummy = save_game.get_64();
+	return save_game.get_64();
+	
+func load_game() -> void:
+	var save_game = File.new()
+	save_game.open("user://achronaldungeon.sav", File.READ)
+	tutorial_substate = save_game.get_64();
+	var amount = save_game.get_64();
+	for i in range(amount):
+		consume_greenality(Vector2(save_game.get_64(), save_game.get_64()));
+	ever_used_warp_wings = true; # TODO: or just save it
+	if greenality_timer > 1:
+		greenality_timer = 1;
+		play_sound("getgreenality");
+	update_hero_info();
 		
 func consume_item(dest_loc: Vector2) -> void:
 	var multiplier_dest = multipliermap.get_cellv(dest_loc);
@@ -1018,6 +1058,8 @@ func _process(delta: float) -> void:
 	step_sfx_played_this_frame = false;
 	action_previews_modulate();
 	update_hover_info();
+	if (get_node("LoadSavePrompt") != null):
+		return
 	if (Input.is_action_just_pressed("mute") or (Input.is_action_just_pressed("ui_accept") and soundon.get_rect().has_point(soundon.to_local(get_viewport().get_mouse_position())))):
 		toggle_mute();
 	if (Input.is_action_just_pressed("pause_animations") or (Input.is_action_just_pressed("ui_accept") and pauseon.get_rect().has_point(pauseon.to_local(get_viewport().get_mouse_position())))):
