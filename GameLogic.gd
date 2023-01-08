@@ -1058,7 +1058,7 @@ func _process(delta: float) -> void:
 	step_sfx_played_this_frame = false;
 	action_previews_modulate();
 	update_hover_info();
-	if (get_node("LoadSavePrompt") != null):
+	if (get_node_or_null("LoadSavePrompt") != null):
 		return
 	if (Input.is_action_just_pressed("mute") or (Input.is_action_just_pressed("ui_accept") and soundon.get_rect().has_point(soundon.to_local(get_viewport().get_mouse_position())))):
 		toggle_mute();
