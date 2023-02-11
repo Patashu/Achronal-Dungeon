@@ -340,7 +340,7 @@ func check_secret_endings() -> void:
 		secret_endings["TELEPORT"] = true;
 	if (hero_turn < 60 and !green_hero):
 		secret_endings["SPEEDRUN"] = true;
-	if (hero_keypresses < 196):
+	if (hero_keypresses < 193):
 		secret_endings["TIMERUN"] = true;
 	var greenality_used = greenality_max - greenality_avail;
 	if (greenality_used <= 2):
@@ -349,7 +349,7 @@ func check_secret_endings() -> void:
 		secret_endings["OUCH"] = true;
 	if (hero_hp >= 1796 and !green_hero):
 		secret_endings["MAX HP"] = true;
-	if (hero_atk >= 94 and !green_hero):
+	if (hero_atk >= 96 and !green_hero):
 		secret_endings["MAX ATK"] = true;
 	if (hero_def >= 73 and !green_hero):
 		secret_endings["MAX DEF"] = true;
