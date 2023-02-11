@@ -343,8 +343,10 @@ func check_secret_endings() -> void:
 	if (hero_keypresses < 163):
 		secret_endings["TIMERUN"] = true;
 	var greenality_used = greenality_max - greenality_avail;
-	if (greenality_used <= 2):
+	if (greenality_used == 2):
 		secret_endings["SMUGGLER"] = true;
+	if (greenality_used == 1):
+		secret_endings["SMUGGLER LORD"] = true;
 	if (hero_hp <= 1):
 		secret_endings["OUCH"] = true;
 	if (hero_hp >= 1796 and !green_hero):
