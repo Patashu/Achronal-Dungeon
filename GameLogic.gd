@@ -340,7 +340,7 @@ func check_secret_endings() -> void:
 		secret_endings["TELEPORT"] = true;
 	if (hero_turn < 60 and !green_hero):
 		secret_endings["SPEEDRUN"] = true;
-	if (hero_keypresses < 193):
+	if (hero_keypresses < 163):
 		secret_endings["TIMERUN"] = true;
 	var greenality_used = greenality_max - greenality_avail;
 	if (greenality_used <= 2):
@@ -587,6 +587,8 @@ func print_message(message: String)-> void:
 func meta_restart() -> void:
 	residuemap.clear();
 	pickaxe_this_meta_restart = false;
+	# so you can get multiple secret endings in one meta-restart, for funsies
+	secret_endings.clear();
 	restart(true);
 	# fine as long as doing undo and meta undo events in arbitrary order commutes.
 	# might get weird with Green Player, I'll have to test some things or maybe just hard code it.
@@ -638,7 +640,6 @@ func undo_one_event(event: Array) -> bool:
 			play_sound("greensmall");
 	elif (event[0] == "win"):
 		has_won = false;
-		secret_endings.clear();
 		winning_timer = 0;
 		actormap.modulate = Color(1, 1, 1, 1);
 		if (green_hero):
