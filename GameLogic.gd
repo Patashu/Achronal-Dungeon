@@ -338,7 +338,7 @@ func win(dest_loc: Vector2) -> void:
 func check_secret_endings() -> void:
 	if (hero_turn < 1):
 		secret_endings["TELEPORT"] = true;
-	if (hero_turn < 60 and !green_hero):
+	if (hero_turn < 38 and !green_hero):
 		secret_endings["SPEEDRUN"] = true;
 	if (hero_keypresses < 163):
 		secret_endings["TIMERUN"] = true;
