@@ -25,6 +25,8 @@ onready var greenalitypreview3 : Sprite = get_node("/root/PlayingField/Greenalit
 onready var greenalitypreview4 : Sprite = get_node("/root/PlayingField/GreenalityPreview4");
 onready var greenalitypreview5 : Sprite = get_node("/root/PlayingField/GreenalityPreview5");
 onready var newfeaturesbutton : Button = get_node("/root/PlayingField/NewFeaturesButton");
+var screen_width = ProjectSettings.get_setting("display/window/size/width");
+var screen_height = ProjectSettings.get_setting("display/window/size/height");
 var hero_loc : Vector2 = Vector2.ZERO;
 var hero_loc_start : Vector2 = Vector2.ZERO;
 var hero_hp : int = 80;
@@ -93,7 +95,7 @@ func _ready() -> void:
 func _new_features_button_pressed() -> void:
 	var a = preload("res://NewFeaturesPrompt.tscn").instance()
 	self.add_child(a);
-	a.position = Vector2(112, 130);
+	a.position = Vector2(screen_width/2, screen_height/2) - (a.get_node("Label").rect_size)/2;
 
 func calculate_map_size() -> void:
 	var tiles = floormap.get_used_cells();
