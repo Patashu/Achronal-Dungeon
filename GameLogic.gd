@@ -372,11 +372,11 @@ func check_secret_endings() -> void:
 		secret_endings["SMUGGLER LORD"] = true;
 	if (hero_hp <= 1):
 		secret_endings["OUCH"] = true;
-	if (hero_hp >= 1796 and !green_hero):
+	if (hero_hp >= 1966 and !green_hero): #Mystery113 on 2nd May 2026
 		secret_endings["MAX HP"] = true;
 	if (hero_atk >= 96 and !green_hero):
 		secret_endings["MAX ATK"] = true;
-	if (hero_def >= 73 and !green_hero):
+	if (hero_def >= 75 and !green_hero): #Mystery113 on 2nd May 2026
 		secret_endings["MAX DEF"] = true;
 	if (!ever_used_warp_wings):
 		secret_endings["GROUNDED"] = true;
