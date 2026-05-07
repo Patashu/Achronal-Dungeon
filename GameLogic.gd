@@ -24,6 +24,7 @@ onready var greenalitypreview2 : Sprite = get_node("/root/PlayingField/Greenalit
 onready var greenalitypreview3 : Sprite = get_node("/root/PlayingField/GreenalityPreview3");
 onready var greenalitypreview4 : Sprite = get_node("/root/PlayingField/GreenalityPreview4");
 onready var greenalitypreview5 : Sprite = get_node("/root/PlayingField/GreenalityPreview5");
+onready var newfeaturesbutton : Button = get_node("/root/PlayingField/NewFeaturesButton");
 var hero_loc : Vector2 = Vector2.ZERO;
 var hero_loc_start : Vector2 = Vector2.ZERO;
 var hero_hp : int = 80;
@@ -67,6 +68,7 @@ var secret_endings = {};
 var ever_used_warp_wings = false;
 var pickaxe_this_meta_restart = false;
 var greenalities_acquired = [];
+var user_replay : String = "";
 
 func _ready() -> void:
 	# setup hero info
@@ -86,6 +88,12 @@ func _ready() -> void:
 		loadsaveprompt.amount = how_many;
 		loadsaveprompt.connect("confirm_pressed", self, "load_game");
 	print_message("Welcome to the Achronal Dungeon! You won't escape this time.")
+	newfeaturesbutton.connect("pressed", self, "_new_features_button_pressed");
+
+func _new_features_button_pressed() -> void:
+	var a = preload("res://NewFeaturesPrompt.tscn").instance()
+	self.add_child(a);
+	a.position = Vector2(112, 130);
 
 func calculate_map_size() -> void:
 	var tiles = floormap.get_used_cells();
@@ -478,12 +486,22 @@ func consume_item(dest_loc: Vector2) -> void:
 		message += " GREEN changes persist through undo (z) and restart (r)."
 		pass
 	print_message(message);
-		
+
 func move_hero_commit(dir: Vector2) -> void:
 	add_undo_event(["move", hero_loc]);
 	move_hero_silently(dir);
 	hero_turn += 1;
 	hero_keypresses += 1;
+	if (dir == Vector2.RIGHT):
+		user_replay += "d";
+	elif (dir == Vector2.LEFT):
+		user_replay += "a";
+	elif (dir == Vector2.UP):
+		user_replay += "w";
+	elif (dir == Vector2.DOWN):
+		user_replay += "s";
+	else: #technically you can warp wings one tile over but this never optimal, so you get a free replay optimization!
+		user_replay += "x";
 	update_hero_info();
 
 func move_hero_silently(dir: Vector2) -> void:
@@ -501,6 +519,18 @@ func try_warp_wings() -> void:
 	var dest_loc = Vector2(map_x_max - hero_loc.x, map_y_max - hero_loc.y);
 	var dir = dest_loc - hero_loc;
 	move_hero(dir, true);
+
+func user_replay_letter_for_greenality(dir: Vector2) -> void:
+	if (dir == Vector2.RIGHT):
+		user_replay += "D";
+	elif (dir == Vector2.LEFT):
+		user_replay += "A";
+	elif (dir == Vector2.UP):
+		user_replay += "W";
+	elif (dir == Vector2.DOWN):
+		user_replay += "S";
+	else: #not possible I think, just a fallback
+		user_replay += "X";
 
 func try_greenality(dir: Vector2) -> void:
 	if (greenality_avail <= 0):
@@ -551,6 +581,7 @@ func try_greenality(dir: Vector2) -> void:
 			greenality_avail -= 1;
 			hero_turn += 1;
 			hero_keypresses += 1;
+			user_replay_letter_for_greenality(dir);
 			update_hero_info();
 			play_sound("greenplayer");
 			tutorial_substate = max(tutorial_substate, 4);
@@ -569,6 +600,7 @@ func try_greenality(dir: Vector2) -> void:
 	print_message("The " + name_thing(dest_name, multiplier_val) + " is now GREEN.");
 	hero_turn += 1;
 	hero_keypresses += 1;
+	user_replay_letter_for_greenality(dir);
 	update_hero_info();
 	play_sound("usegreenality");
 	tutorial_substate = max(tutorial_substate, 4);
@@ -603,15 +635,18 @@ func meta_restart() -> void:
 	hero_atk = hero_atk_start;
 	hero_def = hero_def_start;
 	hero_keypresses = 0;
+	user_replay = ""; #or R if we wanted replays that included meta_restart~
 	greenality_avail = greenality_max;
 	update_hero_info();
 	play_sound("metarestart");
 
 func restart(is_silent: bool = false) -> void:
 	var hero_keypresses_temp = hero_keypresses;
+	var user_replay_temp = user_replay;
 	while (hero_turn > 0):
 		undo(true);
 	hero_keypresses = hero_keypresses_temp + 1;
+	user_replay_temp = user_replay + "r";
 	update_hero_info();
 	if (!is_silent):
 		play_sound("restart");
@@ -627,6 +662,7 @@ func undo(is_silent: bool = false) -> bool:
 		
 	hero_turn -= 1;
 	hero_keypresses += 1;
+	user_replay += "z";
 	update_hero_info();
 	if (!is_silent):
 		play_sound("undo");
@@ -1050,6 +1086,74 @@ func action_previews_modulate() -> void:
 		greenalitypreview4.modulate = Color(t, t, t, t);
 		greenalitypreview5.modulate = Color(t, t, t, t);
 
+func copy_level() -> void:
+	pass #TODO
+	
+func looks_like_level(custom: String) -> void:
+	pass #TODO
+
+func paste_level(clipboard: String) -> void:
+	clipboard = clipboard.strip_edges();
+	load_custom_level(clipboard);
+	
+func load_custom_level(custom: String) -> void:
+	var level = deserialize_custom_level(custom);
+	if level == null:
+		return;
+	
+	#TODO
+	
+func deserialize_custom_level(custom: String) -> Node:
+	return null; #TODO
+	
+func is_valid_replay(replay: String) -> bool:
+	replay = replay.strip_edges();
+	replay = replay.to_lower();
+	if replay.length() <= 0:
+		return false;
+	for letter in replay:
+		if !(letter in "wasdxzr"):
+			return false;
+	return true;
+	
+func start_specific_replay(replay: String) -> void:
+	replay = replay.strip_edges();
+	if (!is_valid_replay(replay)):
+		print_message("Ctrl+V: Invalid replay");
+		return;
+	meta_restart();
+	for letter in replay:
+		do_one_letter(letter);
+
+func do_one_letter(replay_char: String) -> void:
+	match replay_char:
+		"w":
+			move_hero(Vector2.UP);
+		"a":
+			move_hero(Vector2.LEFT);
+		"s":
+			move_hero(Vector2.DOWN);
+		"d":
+			move_hero(Vector2.RIGHT);
+		"x":
+			try_warp_wings();
+		"W":
+			try_greenality(Vector2.UP);
+		"A":
+			try_greenality(Vector2.LEFT);
+		"S":
+			try_greenality(Vector2.DOWN);
+		"D":
+			try_greenality(Vector2.RIGHT);
+		"z":
+			undo();
+		"r":
+			restart();
+		"R":
+			meta_restart();
+		_:
+			print_message("Hmm, didn't recognize " + replay_char + ".");
+
 func _process(delta: float) -> void:
 	timer += delta;
 	if (greenality_timer > 0):
@@ -1062,6 +1166,8 @@ func _process(delta: float) -> void:
 	action_previews_modulate();
 	update_hover_info();
 	if (get_node_or_null("LoadSavePrompt") != null):
+		return
+	if (get_node_or_null("NewFeaturesPrompt") != null):
 		return
 	if (Input.is_action_just_pressed("mute") or (Input.is_action_just_pressed("ui_accept") and soundon.get_rect().has_point(soundon.to_local(get_viewport().get_mouse_position())))):
 		toggle_mute();
@@ -1132,3 +1238,20 @@ func _process(delta: float) -> void:
 					is_running = true;
 			else:
 				move_hero(dir);
+				
+	if (Input.is_action_pressed("ctrl") and Input.is_action_just_pressed("copy")):
+			if (Input.is_action_pressed("shift")):
+				copy_level();
+			else:
+				# must be kept in sync with Menu
+				if (len(user_replay) > 0):
+					OS.set_clipboard(user_replay);
+					print_message("Ctrl+C: Replay copied");
+				else:
+					print_message("Ctrl+C: Make some moves first!");
+	if (Input.is_action_pressed("ctrl") and Input.is_action_just_pressed("paste")):
+		var clipboard = OS.get_clipboard();
+		if (looks_like_level(clipboard)):
+			paste_level(clipboard);
+		else:
+			start_specific_replay(clipboard);

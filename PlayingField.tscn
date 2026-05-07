@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://tiles.tres" type="TileSet" id=1]
 [ext_resource path="res://GameLogic.gd" type="Script" id=2]
@@ -13,6 +13,7 @@
 [ext_resource path="res://assets/pauseon2.png" type="Texture" id=11]
 [ext_resource path="res://CoolCircle.gd" type="Script" id=12]
 [ext_resource path="res://residuetiles.tres" type="TileSet" id=13]
+[ext_resource path="res://borderstylebox.tres" type="StyleBox" id=14]
 
 [sub_resource type="AnimatedTexture" id=1]
 frames = 2
@@ -163,3 +164,18 @@ texture = SubResource( 1 )
 
 [node name="CoolCircle" type="Node2D" parent="."]
 script = ExtResource( 12 )
+
+[node name="NewFeaturesButton" type="Button" parent="."]
+margin_left = 418.0
+margin_top = 319.0
+margin_right = 496.0
+margin_bottom = 334.0
+custom_colors/font_color_disabled = Color( 0.756863, 0.54902, 0.447059, 1 )
+custom_colors/font_color_focus = Color( 0.988235, 0.921569, 0.713726, 1 )
+custom_colors/font_color = Color( 0.988235, 0.921569, 0.713726, 1 )
+custom_fonts/font = ExtResource( 6 )
+custom_styles/hover = ExtResource( 14 )
+custom_styles/pressed = ExtResource( 14 )
+custom_styles/focus = ExtResource( 14 )
+custom_styles/normal = ExtResource( 14 )
+text = "New! Features"
