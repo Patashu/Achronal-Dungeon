@@ -1,22 +1,18 @@
 extends Node2D
-class_name NewFeaturesPrompt
+class_name LevelEditorPrompt
 
 onready var label = get_node("Label");
 onready var confirm = get_node("ButtonConfirm");
-onready var cancel = get_node("ButtonCancel");
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	confirm.connect("pressed", self, "_confirm_pressed");
-	cancel.connect("pressed", self, "_cancel_pressed");
+	$LinkButton.connect("pressed", self, "_link_button_pressed");
+
+func _link_button_pressed() -> void:
+	OS.shell_open($LinkButton.text);
 
 func _confirm_pressed() -> void:
-	var a = preload("res://LevelEditorPrompt.tscn").instance()
-	self.get_parent().add_child(a);
-	a.position = Vector2(self.get_parent().screen_width/2, self.get_parent().screen_height/2) - (a.get_node("Label").rect_size)/2;
-	self.queue_free();
-
-func _cancel_pressed() -> void:
 	self.queue_free();
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -24,7 +20,7 @@ func _process(delta: float) -> void:
 	if (Input.is_action_just_pressed("action")):
 		_confirm_pressed();
 	if (Input.is_action_just_pressed("undo")):
-		_cancel_pressed();
+		_confirm_pressed();
 
 func _draw() -> void:
 	draw_rect(Rect2(-get_viewport().size.x, -get_viewport().size.y,

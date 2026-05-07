@@ -1343,6 +1343,8 @@ func _process(delta: float) -> void:
 		return
 	if (get_node_or_null("NewFeaturesPrompt") != null):
 		return
+	if (get_node_or_null("LevelEditorPrompt") != null): #not annoying enough to make me refactor this YET.
+		return
 	if (Input.is_action_just_pressed("mute") or (Input.is_action_just_pressed("ui_accept") and soundon.get_rect().has_point(soundon.to_local(get_viewport().get_mouse_position())))):
 		toggle_mute();
 	if (Input.is_action_just_pressed("pause_animations") or (Input.is_action_just_pressed("ui_accept") and pauseon.get_rect().has_point(pauseon.to_local(get_viewport().get_mouse_position())))):

@@ -1,0 +1,53 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://borderstylebox.tres" type="StyleBox" id=1]
+[ext_resource path="res://standardfont.tres" type="DynamicFont" id=2]
+[ext_resource path="res://LevelEditorPrompt.gd" type="Script" id=3]
+
+[node name="LevelEditorPrompt" type="Node2D"]
+script = ExtResource( 3 )
+
+[node name="Label" type="Label" parent="."]
+margin_left = 1.0
+margin_top = 1.0
+margin_right = 341.0
+margin_bottom = 219.0
+rect_pivot_offset = Vector2( 124, 41 )
+custom_colors/font_color = Color( 0.988235, 0.921569, 0.713726, 1 )
+custom_fonts/font = ExtResource( 2 )
+custom_styles/normal = ExtResource( 1 )
+text = "Ctrl+Shift+L: Toggle Level Editor Mode
+While it's enabled...
+1) There's now a tile ghost under your mouse. Right click to eyedrop (copy hovered tile t ghost)  Left click to place ghost. ('Green Residue' tile used as a stand-in for Empty Floor.)
+2) Scroll the mouse wheel up/down to scroll through valid tiles for your current layer.
+3) Press 0/1 to swap between Floor/Multipler layer.
+4) Bottom right corner has a 'Level Info' button for editing name, author and Katamu (that's the species the Player is!) starting state.
+5) Community custom levels go here:"
+autowrap = true
+
+[node name="ButtonConfirm" type="Button" parent="."]
+margin_left = 127.0
+margin_top = 184.0
+margin_right = 216.0
+margin_bottom = 211.0
+custom_colors/font_color_disabled = Color( 0.756863, 0.54902, 0.447059, 1 )
+custom_colors/font_color_focus = Color( 0.988235, 0.921569, 0.713726, 1 )
+custom_colors/font_color = Color( 0.988235, 0.921569, 0.713726, 1 )
+custom_fonts/font = ExtResource( 2 )
+custom_styles/hover = ExtResource( 1 )
+custom_styles/pressed = ExtResource( 1 )
+custom_styles/focus = ExtResource( 1 )
+custom_styles/normal = ExtResource( 1 )
+text = "Cool! (Z/X)"
+
+[node name="LinkButton" type="LinkButton" parent="."]
+margin_left = 40.0
+margin_top = 161.0
+margin_right = 297.0
+margin_bottom = 175.0
+custom_colors/font_color_focus = Color( 0.662745, 0.941176, 0.372549, 1 )
+custom_colors/font_color = Color( 0.662745, 0.941176, 0.372549, 1 )
+custom_colors/font_color_hover = Color( 0.662745, 0.941176, 0.372549, 1 )
+custom_colors/font_color_pressed = Color( 0.662745, 0.941176, 0.372549, 1 )
+custom_fonts/font = ExtResource( 2 )
+text = "https://github.com/Patashu/Achronal-Dungeon/wiki"

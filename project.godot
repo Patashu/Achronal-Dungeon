@@ -15,6 +15,11 @@ _global_script_classes=[ {
 "path": "res://GameLogic.gd"
 }, {
 "base": "Node2D",
+"class": "LevelEditorPrompt",
+"language": "GDScript",
+"path": "res://LevelEditorPrompt.gd"
+}, {
+"base": "Node2D",
 "class": "LoadSavePrompt",
 "language": "GDScript",
 "path": "res://LoadSavePrompt.gd"
@@ -26,6 +31,7 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "GameLogic": "",
+"LevelEditorPrompt": "",
 "LoadSavePrompt": "",
 "NewFeaturesPrompt": ""
 }
