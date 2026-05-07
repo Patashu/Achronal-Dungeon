@@ -24,9 +24,6 @@ onready var greenalitypreview2 : Sprite = get_node("/root/PlayingField/Greenalit
 onready var greenalitypreview3 : Sprite = get_node("/root/PlayingField/GreenalityPreview3");
 onready var greenalitypreview4 : Sprite = get_node("/root/PlayingField/GreenalityPreview4");
 onready var greenalitypreview5 : Sprite = get_node("/root/PlayingField/GreenalityPreview5");
-onready var newfeaturesbutton : Button = get_node("/root/PlayingField/NewFeaturesButton");
-var screen_width = ProjectSettings.get_setting("display/window/size/width");
-var screen_height = ProjectSettings.get_setting("display/window/size/height");
 var hero_loc : Vector2 = Vector2.ZERO;
 var hero_loc_start : Vector2 = Vector2.ZERO;
 var hero_hp : int = 80;
@@ -71,11 +68,22 @@ var ever_used_warp_wings = false;
 var pickaxe_this_meta_restart = false;
 var greenalities_acquired = [];
 #New! Features
+onready var newfeaturesbutton : Button = get_node("/root/PlayingField/NewFeaturesButton");
+onready var levelinfobutton : Button = get_node("/root/PlayingField/LevelInfoButton");
+onready var pen : Sprite = get_node("/root/PlayingField/Pen");
+var screen_width = ProjectSettings.get_setting("display/window/size/width");
+var screen_height = ProjectSettings.get_setting("display/window/size/height");
 var user_replay : String = "";
 var is_custom : bool = false;
 var custom_string : String = "";
 var level_name : String = "Achronal Dungeon";
 var level_author : String = "Patashu";
+var level_editor_mode : bool = false;
+var level_editor_floor : bool = true;
+var pen_tile: int = -1;
+var pen_xy = Vector2.ZERO;
+var picker_array_floor : Array = [];
+var picker_array_multiplier : Array = [];
 
 func _ready() -> void:
 	# setup hero info
@@ -97,9 +105,64 @@ func _ready() -> void:
 	print_message("Welcome to the Achronal Dungeon! You won't escape this time.")
 	#New! Features
 	newfeaturesbutton.connect("pressed", self, "_new_features_button_pressed");
+	levelinfobutton.connect("pressed", self, "_level_info_button_pressed");
+	init_valid_floor_names();
+	
+func init_valid_floor_names() -> void:
+	picker_array_floor.append(-1); #Empty Floor
+	picker_array_floor.append(00); #Potion
+	picker_array_floor.append(01); #Shield
+	picker_array_floor.append(02); #Sword
+	picker_array_floor.append(03); #Enemyguard
+	picker_array_floor.append(04); #Greenality
+	picker_array_floor.append(05); #Greenpotion
+	picker_array_floor.append(06); #Greenshield
+	picker_array_floor.append(07); #Greensword
+	picker_array_floor.append(09); #Wall
+	picker_array_floor.append(10); #Win
+	picker_array_floor.append(23); #Enemyfire
+	picker_array_floor.append(24); #Enemyslime
+	picker_array_floor.append(25); #Enemyteeth
+	picker_array_floor.append(26); #Greenenemyguard
+	picker_array_floor.append(27); #Greenenemyfire
+	picker_array_floor.append(28); #Greenenemyslime
+	picker_array_floor.append(29); #Greenenemyteeth
+	picker_array_floor.append(30); #Greenpickaxe
+	picker_array_floor.append(32); #Greenwall
+	picker_array_floor.append(33); #Greenwarpwings
+	picker_array_floor.append(34); #Magicmirror
+	picker_array_floor.append(35); #Pickaxe
+	picker_array_floor.append(36); #Warpwings
+	picker_array_floor.append(37); #Key
+	picker_array_floor.append(38); #Lock
+	picker_array_floor.append(39); #Greenkey
+	picker_array_floor.append(40); #Greenlock
+	picker_array_floor.append(54); #Headband
+	picker_array_floor.append(55); #Greenheadband
+	picker_array_floor.append(61); #Steel
+	
+	picker_array_multiplier.append(-1); #Empty Floor
+	for i in range(1, 10):
+		picker_array_multiplier.append(number_to_multiplier_id(i));
+	for i in range(10, 45, 5): #no 45
+		picker_array_multiplier.append(number_to_multiplier_id(i));
+	for i in range(50, 100, 10):
+		picker_array_multiplier.append(number_to_multiplier_id(i));
+	picker_array_multiplier.append(number_to_multiplier_id(100));
+	picker_array_multiplier.append(number_to_multiplier_id(200));
+	picker_array_multiplier.append(number_to_multiplier_id(300));
+	picker_array_multiplier.append(number_to_multiplier_id(500));
+	picker_array_multiplier.append(number_to_multiplier_id(1000));
+	picker_array_multiplier.append(number_to_multiplier_id(2000));
+	picker_array_multiplier.append(number_to_multiplier_id(5000));
 
 func _new_features_button_pressed() -> void:
 	var a = preload("res://NewFeaturesPrompt.tscn").instance()
+	self.add_child(a);
+	a.position = Vector2(screen_width/2, screen_height/2) - (a.get_node("Label").rect_size)/2;
+	
+func _level_info_button_pressed() -> void:
+	var a = preload("res://LevelInfoEdit.tscn").instance()
 	self.add_child(a);
 	a.position = Vector2(screen_width/2, screen_height/2) - (a.get_node("Label").rect_size)/2;
 
@@ -1006,6 +1069,12 @@ func multiplier_id_to_number(id: int) -> int:
 		return 1;
 	var string_result = multipliermap.tile_set.tile_get_name(id);
 	return int(string_result);
+	
+func number_to_multiplier_id(number: int) -> int:
+	if (number < 1):
+		return -1;
+	var id_result = multipliermap.tile_set.find_tile_by_name(str(number));
+	return id_result;
 
 func try_greenality_mouse() -> void:
 	var dest_loc = floormap.world_to_map(get_viewport().get_mouse_position());
@@ -1104,8 +1173,9 @@ func action_previews_modulate() -> void:
 		greenalitypreview5.modulate = Color(t, t, t, t);
 
 func serialize_current_level() -> String:
-	if (is_custom):
-		return custom_string;
+	calculate_map_size();
+	#if (is_custom):
+	#	return custom_string;
 	
 	var result = "AchronalDungeonStart: " + level_name + " by " + level_author + "\n";
 	var level_metadata = {};
@@ -1328,6 +1398,45 @@ func do_one_letter(replay_char: String) -> void:
 		_:
 			print_message("Hmm, didn't recognize " + replay_char + ".");
 
+#level editor start
+
+func picker_cycle(impulse: int) -> void:
+	var picker_array = picker_array_floor;
+	if (!level_editor_floor):
+		picker_array = picker_array_multiplier;
+	var current_index = picker_array.find(pen_tile);
+	if (current_index == -1):
+		current_index = 0;
+	current_index += impulse;
+	if (current_index < 0):
+		current_index += picker_array.size();
+	elif (current_index >= picker_array.size()):
+		current_index -= picker_array.size();
+	pen_tile = picker_array[current_index];
+	change_pen_tile();
+	
+func change_pen_tile() -> void:
+	var tile_set = floormap.tile_set;
+	if (pen_tile >= 0):
+		pen.texture = tile_set.tile_get_texture(pen_tile);
+	else:
+		pen.texture = preload("res://assets/residue.png");
+		
+func lmb() -> void:
+	var terrain_layer = floormap;
+	if (!level_editor_floor):
+		terrain_layer = multipliermap;
+	terrain_layer.set_cellv(pen_xy, pen_tile);
+
+func rmb() -> void:
+	var terrain_layer = floormap;
+	if (!level_editor_floor):
+		terrain_layer = multipliermap;
+	pen_tile = terrain_layer.get_cellv(pen_xy);
+	change_pen_tile();
+		
+#level editor end
+
 func _process(delta: float) -> void:
 	timer += delta;
 	if (greenality_timer > 0):
@@ -1345,76 +1454,126 @@ func _process(delta: float) -> void:
 		return
 	if (get_node_or_null("LevelEditorPrompt") != null): #not annoying enough to make me refactor this YET.
 		return
+	if (get_node_or_null("LevelInfoEdit") != null): #it's ok... it's the last one... why refactor now...
+		return
 	if (Input.is_action_just_pressed("mute") or (Input.is_action_just_pressed("ui_accept") and soundon.get_rect().has_point(soundon.to_local(get_viewport().get_mouse_position())))):
 		toggle_mute();
 	if (Input.is_action_just_pressed("pause_animations") or (Input.is_action_just_pressed("ui_accept") and pauseon.get_rect().has_point(pauseon.to_local(get_viewport().get_mouse_position())))):
 		toggle_pause();
-	if (Input.is_action_just_pressed("wallhack") and OS.is_debug_build()):
-		print_message("DEBUG: Wallhack toggled.")
-		wallhack = !wallhack;
-	if (Input.is_action_just_pressed("undo")):
-		tutorial_substate = max(tutorial_substate, 2);
-		if (!Input.is_action_pressed("run_modifier")):
-			var stateful = false;
-			var is_silent = false;
-			while !stateful:
-				stateful = undo(is_silent);
-				is_silent = true;
-		else:
-			undo();
-	if (Input.is_action_just_pressed("restart")):
-		tutorial_substate = max(tutorial_substate, 2);
-		restart();
-	if (Input.is_action_just_pressed("meta_restart")):
-		tutorial_substate = max(tutorial_substate, 4);
-		meta_restart();
-	if (has_won):
-		return;
-		
-	if (Input.is_action_just_pressed("pathfind_to")):
-		if (action_primed):
-			try_greenality_mouse();
-			action_primed = false;
-			action_previews_off();
-		else:
-			try_pathfind();
-		
-	if (Input.is_action_just_pressed("action")):
-		action_primed = true;
-		action_previews_on();
-	if (Input.is_action_just_released("action")):
-		if (action_primed):
-			try_warp_wings();
-			action_primed = false;
-			action_previews_off();
-		else:
-			pass
-			# user did a greenality
-	var dir = Vector2.ZERO;
-	if (Input.is_action_just_pressed("ui_left")):
-		dir = Vector2.LEFT;
-	if (Input.is_action_just_pressed("ui_right")):
-		dir = Vector2.RIGHT;
-	if (Input.is_action_just_pressed("ui_up")):
-		dir = Vector2.UP;
-	if (Input.is_action_just_pressed("ui_down")):
-		dir = Vector2.DOWN;
-		
-	if dir != Vector2.ZERO:
-		if (action_primed):
-			try_greenality(dir);
-			action_primed = false;
-			action_previews_off();
-		else:
-			if (Input.is_action_pressed("run_modifier")):
-				var is_running = false;
-				var result = true;
-				while result:
-					result = move_hero(dir, false, is_running);
-					is_running = true;
+	
+	if (!level_editor_mode):
+		if (Input.is_action_just_pressed("wallhack") and OS.is_debug_build()):
+			print_message("DEBUG: Wallhack toggled.")
+			wallhack = !wallhack;
+		if (Input.is_action_just_pressed("undo")):
+			tutorial_substate = max(tutorial_substate, 2);
+			if (!Input.is_action_pressed("run_modifier")):
+				var stateful = false;
+				var is_silent = false;
+				while !stateful:
+					stateful = undo(is_silent);
+					is_silent = true;
 			else:
-				move_hero(dir);
-				
+				undo();
+		if (Input.is_action_just_pressed("restart")):
+			tutorial_substate = max(tutorial_substate, 2);
+			restart();
+		if (Input.is_action_just_pressed("meta_restart")):
+			tutorial_substate = max(tutorial_substate, 4);
+			meta_restart();
+		if (has_won):
+			return;
+			
+		if (Input.is_action_just_pressed("pathfind_to")):
+			if (action_primed):
+				try_greenality_mouse();
+				action_primed = false;
+				action_previews_off();
+			else:
+				try_pathfind();
+			
+		if (Input.is_action_just_pressed("action")):
+			action_primed = true;
+			action_previews_on();
+		if (Input.is_action_just_released("action")):
+			if (action_primed):
+				try_warp_wings();
+				action_primed = false;
+				action_previews_off();
+			else:
+				pass
+				# user did a greenality
+		var dir = Vector2.ZERO;
+		if (Input.is_action_just_pressed("ui_left")):
+			dir = Vector2.LEFT;
+		if (Input.is_action_just_pressed("ui_right")):
+			dir = Vector2.RIGHT;
+		if (Input.is_action_just_pressed("ui_up")):
+			dir = Vector2.UP;
+		if (Input.is_action_just_pressed("ui_down")):
+			dir = Vector2.DOWN;
+			
+		if dir != Vector2.ZERO:
+			if (action_primed):
+				try_greenality(dir);
+				action_primed = false;
+				action_previews_off();
+			else:
+				if (Input.is_action_pressed("run_modifier")):
+					var is_running = false;
+					var result = true;
+					while result:
+						result = move_hero(dir, false, is_running);
+						is_running = true;
+				else:
+					move_hero(dir);
+	else: # Level Editor
+		var mouse_position = get_viewport().get_mouse_position();
+		pen_xy = floormap.world_to_map(mouse_position);
+		var cell_size = floormap.cell_size;
+		pen.position = cell_size*(pen_xy+Vector2(1, 1))+floormap.position-cell_size/2;
+		
+		var over_menu_button = false;
+		var draw_mode = levelinfobutton.get_draw_mode();
+		if (draw_mode == 1 or draw_mode == 3 or draw_mode == 4):
+			over_menu_button = true;
+		if (Input.is_mouse_button_pressed(1)):
+			if !over_menu_button:
+				lmb();
+		if (Input.is_mouse_button_pressed(2)):
+			if !over_menu_button:
+				rmb();
+		if (Input.is_action_just_released("mouse_wheel_up")):
+			picker_cycle(1);
+		if (Input.is_action_just_released("mouse_wheel_down")):
+			picker_cycle(-1); #opposite from Entwined Time engine because multipliers felt backwards
+		if (Input.is_action_just_pressed("1")):
+			level_editor_floor = true;
+			pen_tile = -1;
+			change_pen_tile();
+		if (Input.is_action_just_pressed("2")):
+			level_editor_floor = false;
+			pen_tile = multipliermap.tile_set.find_tile_by_name("2");
+			change_pen_tile();
+	
+	#enter/exit level editor, copy/paste
+	if (Input.is_action_pressed("ctrl") and Input.is_action_just_pressed("level_editor")):
+			if (Input.is_action_pressed("shift")):
+				meta_restart();
+				var message = "Ctrl+Shift+L: Level Editor ";
+				if (!level_editor_mode):
+					message += "Enabled.";
+					level_editor_mode = true;
+					pen_tile = -1;
+					level_editor_floor = true;
+					change_pen_tile();
+				else:
+					message += "Disabled."
+					level_editor_mode = false;
+				pen.visible = level_editor_mode;
+				levelinfobutton.visible = level_editor_mode;
+				print_message(message);
+	
 	if (Input.is_action_pressed("ctrl") and Input.is_action_just_pressed("copy")):
 			if (Input.is_action_pressed("shift")):
 				copy_level();

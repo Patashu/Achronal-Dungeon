@@ -179,3 +179,23 @@ custom_styles/pressed = ExtResource( 14 )
 custom_styles/focus = ExtResource( 14 )
 custom_styles/normal = ExtResource( 14 )
 text = "New! Features"
+
+[node name="Pen" type="Sprite" parent="."]
+visible = false
+modulate = Color( 1, 1, 1, 0.501961 )
+
+[node name="LevelInfoButton" type="Button" parent="."]
+visible = false
+margin_left = 499.0
+margin_top = 319.0
+margin_right = 550.0
+margin_bottom = 334.0
+custom_colors/font_color_disabled = Color( 0.756863, 0.54902, 0.447059, 1 )
+custom_colors/font_color_focus = Color( 0.988235, 0.921569, 0.713726, 1 )
+custom_colors/font_color = Color( 0.988235, 0.921569, 0.713726, 1 )
+custom_fonts/font = ExtResource( 6 )
+custom_styles/hover = ExtResource( 14 )
+custom_styles/pressed = ExtResource( 14 )
+custom_styles/focus = ExtResource( 14 )
+custom_styles/normal = ExtResource( 14 )
+text = "Level Info"

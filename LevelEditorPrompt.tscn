@@ -20,7 +20,7 @@ text = "Ctrl+Shift+L: Toggle Level Editor Mode
 While it's enabled...
 1) There's now a tile ghost under your mouse. Right click to eyedrop (copy hovered tile t ghost)  Left click to place ghost. ('Green Residue' tile used as a stand-in for Empty Floor.)
 2) Scroll the mouse wheel up/down to scroll through valid tiles for your current layer.
-3) Press 0/1 to swap between Floor/Multipler layer.
+3) Press 1/2 to swap between Floor/Multipler layer.
 4) Bottom right corner has a 'Level Info' button for editing name, author and Katamu (that's the species the Player is!) starting state.
 5) Community custom levels go here:"
 autowrap = true
