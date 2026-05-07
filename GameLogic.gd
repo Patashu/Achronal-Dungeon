@@ -70,7 +70,12 @@ var secret_endings = {};
 var ever_used_warp_wings = false;
 var pickaxe_this_meta_restart = false;
 var greenalities_acquired = [];
+#New! Features
 var user_replay : String = "";
+var is_custom : bool = false;
+var custom_string : String = "";
+var level_name : String = "Achronal Dungeon";
+var level_author : String = "Patashu";
 
 func _ready() -> void:
 	# setup hero info
@@ -1088,11 +1093,68 @@ func action_previews_modulate() -> void:
 		greenalitypreview4.modulate = Color(t, t, t, t);
 		greenalitypreview5.modulate = Color(t, t, t, t);
 
-func copy_level() -> void:
-	pass #TODO
+func serialize_current_level() -> String:
+	if (is_custom):
+		return custom_string;
 	
-func looks_like_level(custom: String) -> void:
-	pass #TODO
+	var result = "AchronalDungeonStart: " + level_name + " by " + level_author + "\n";
+	var level_metadata = {};
+	var metadatas = ["level_name", "level_author", #"level_replay",
+	#"map_x_max", "map_y_max", #will be automagically calculated
+	"hero_loc_start", "hero_hp_start", "hero_atk_start", "hero_def_start"
+	];
+	for metadata in metadatas:
+		level_metadata[metadata] = self.get(metadata);
+	
+	# TODO: level_replay? Not sure if it makes as much sense for this game.
+	
+	result += to_json(level_metadata);
+	
+	# TODO: Are we just shoving in the layers as they are, not undoing first?
+	
+	var layers : Array = [];
+	layers.append(floormap);
+	layers.append(multipliermap);
+	
+	for i in layers.size():
+		var layer_name = "FLOOR";
+		if (i == 1):
+			layer_name = "MULTIPLIER";
+		result += "\nLAYER " + layer_name + ":\n";
+		var layer = layers[i]; #note: enumerated forwards rather than backwards
+		for y in range(map_y_max+1):
+			for x in range(map_x_max+1):
+				if (x > 0):
+					result += ",";
+				var tile = layer.get_cell(x, y);
+				if (tile >= 0 and i == 1): #pretty print multipliers
+					tile = int(floormap.tile_set.tile_get_name(tile));
+					if (tile >= 1000):
+						tile = str(tile/1000) + "K";
+					elif (tile >= 100):
+						tile = str(tile/100) + "H";
+					elif (tile <= 9):
+						tile = "0" + str(tile);
+					result += str(tile);
+				elif tile >= 0 and tile <= 9:
+					result += "0" + str(tile);
+				else:
+					result += str(tile);
+			result += "\n";
+	
+	result += "AchronalDungeonEnd"
+	return result.split("\n").join("`\n");
+
+func copy_level() -> void:
+	var result = serialize_current_level();
+	print_message("Ctrl+Shift+C: Level copied to clipboard!");
+	OS.set_clipboard(result);
+	
+func looks_like_level(custom: String) -> bool:
+	custom = custom.strip_edges();
+	if custom.find("AchronalDungeonStart") >= 0 and custom.find("AchronalDungeonEnd") >= 0:
+		return true;
+	return false;
 
 func paste_level(clipboard: String) -> void:
 	clipboard = clipboard.strip_edges();
