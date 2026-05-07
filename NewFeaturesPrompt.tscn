@@ -10,20 +10,20 @@ script = ExtResource( 3 )
 [node name="Label" type="Label" parent="."]
 margin_left = 1.0
 margin_top = 1.0
-margin_right = 248.0
+margin_right = 217.0
 margin_bottom = 65.0
 rect_pivot_offset = Vector2( 124, 41 )
 custom_colors/font_color = Color( 0.988235, 0.921569, 0.713726, 1 )
 custom_fonts/font = ExtResource( 2 )
 custom_styles/normal = ExtResource( 1 )
 text = "Ctrl+C/V: Save/Load State from Clipboard
-Ctrl+Shift+C/V: Save/Load Custom Level (TODO)"
+Ctrl+Shift+C/V: Save/Load Custom Level"
 autowrap = true
 
 [node name="ButtonConfirm" type="Button" parent="."]
-margin_left = 82.0
+margin_left = 69.0
 margin_top = 31.0
-margin_right = 160.0
+margin_right = 147.0
 margin_bottom = 58.0
 custom_colors/font_color_disabled = Color( 0.756863, 0.54902, 0.447059, 1 )
 custom_colors/font_color_focus = Color( 0.988235, 0.921569, 0.713726, 1 )

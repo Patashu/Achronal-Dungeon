@@ -95,6 +95,7 @@ func _ready() -> void:
 		loadsaveprompt.amount = how_many;
 		loadsaveprompt.connect("confirm_pressed", self, "load_game");
 	print_message("Welcome to the Achronal Dungeon! You won't escape this time.")
+	#New! Features
 	newfeaturesbutton.connect("pressed", self, "_new_features_button_pressed");
 
 func _new_features_button_pressed() -> void:
@@ -335,6 +336,9 @@ func win(dest_loc: Vector2) -> void:
 	if (green_hero):
 		message += "GREEN ENDING."
 		play_sound("wingreen");
+	elif (is_custom):
+		message += "CUSTOM ENDING."
+		play_sound("winnormal");
 	elif west == -1:
 		message += "HEROIC ENDING."
 		play_sound("winnormal");
@@ -344,13 +348,17 @@ func win(dest_loc: Vector2) -> void:
 	else:
 		message += "ASCENT ENDING."
 		play_sound("winwings");
-	message += " (There are 4 endings.) Undo, restart or meta-restart to continue playing."
+	if (!is_custom):
+		message += " (There are 4 endings.)"
+	message += " Undo, restart or meta-restart to continue playing."
 	print_message(message)
 	has_won = true;
 	add_undo_event(["win"]);
 	check_secret_endings();
 	
 func check_secret_endings() -> void:
+	if (is_custom):
+		return;
 	if (hero_turn < 1):
 		secret_endings["TELEPORT"] = true;
 	if (hero_turn < 38 and !green_hero):
@@ -398,7 +406,7 @@ func consume_greenality(dest_loc: Vector2) -> void:
 	print_message("Use X+dir to turn something GREEN forever. Meta restart with ESC to refund Greenalities.");
 	tutorial_substate = max(tutorial_substate, 3);
 	greenalities_acquired.append(dest_loc);
-	if (how_many_greenalities_saved() < greenalities_acquired.size()):
+	if (!is_custom and how_many_greenalities_saved() < greenalities_acquired.size()):
 		save_game();
 		
 func save_game() -> void:
@@ -626,6 +634,7 @@ func print_message(message: String)-> void:
 	lastmessage.text = message;
 
 func meta_restart() -> void:
+	youareheresign.visible = false;
 	residuemap.clear();
 	pickaxe_this_meta_restart = false;
 	# so you can get multiple secret endings in one meta-restart, for funsies
@@ -766,16 +775,17 @@ func controls_tutorial() -> void:
 		hoverinfo.text += "X to Use Warp Wings\n"
 
 func credits_and_secret_endings() -> void:
-	hoverinfo.text = "CREDITS:\n\nPatashu: Concept, programming, level design, SFX\n\nArt: RoxxyRobofox#6767\n\nPlaytesters: VoxSomniator"
+	hoverinfo.text = "CREDITS:\n\nPatashu: Concept, programming, level design, SFX\n\nArt: RoxxyRobofox\n\nPlaytesters: VoxSomniator"
 	hoverinfo2.text = "\n\n\n\n\n\n\n\n\n\n\n\n";
 	var first_printed = false;
-	for secret in secret_endings.keys():
-		if (!first_printed):
-			hoverinfo2.text += "SECRET ENDING: "
-			first_printed = true;
-		else:
-			hoverinfo2.text += ", "
-		hoverinfo2.text += secret;
+	if (!is_custom):
+		for secret in secret_endings.keys():
+			if (!first_printed):
+				hoverinfo2.text += "SECRET ENDING: "
+				first_printed = true;
+			else:
+				hoverinfo2.text += ", "
+			hoverinfo2.text += secret;
 
 func update_hover_info() -> void:
 	# for the first second of the game, don't show anything but the controls
@@ -1099,8 +1109,7 @@ func serialize_current_level() -> String:
 	
 	var result = "AchronalDungeonStart: " + level_name + " by " + level_author + "\n";
 	var level_metadata = {};
-	var metadatas = ["level_name", "level_author", #"level_replay",
-	#"map_x_max", "map_y_max", #will be automagically calculated
+	var metadatas = ["level_name", "level_author",
 	"hero_loc_start", "hero_hp_start", "hero_atk_start", "hero_def_start"
 	];
 	for metadata in metadatas:
@@ -1121,7 +1130,7 @@ func serialize_current_level() -> String:
 		if (i == 1):
 			layer_name = "MULTIPLIER";
 		result += "\nLAYER " + layer_name + ":\n";
-		var layer = layers[i]; #note: enumerated forwards rather than backwards
+		var layer = layers[i]; #note: unlike ET engine, enumerated forwards rather than backwards
 		for y in range(map_y_max+1):
 			for x in range(map_x_max+1):
 				if (x > 0):
@@ -1161,14 +1170,115 @@ func paste_level(clipboard: String) -> void:
 	load_custom_level(clipboard);
 	
 func load_custom_level(custom: String) -> void:
+	meta_restart();
 	var level = deserialize_custom_level(custom);
 	if level == null:
 		return;
 	
-	#TODO
+	tutorial_substate = 99;
+	
+	is_custom = true;
+	custom_string = custom;
+	meta_restart();
 	
 func deserialize_custom_level(custom: String) -> Node:
-	return null; #TODO
+	custom = custom.strip_edges();
+	if custom.find("\n") >= 0:
+		custom = custom.replace("`", "");
+	else:
+		custom = custom.replace("`", "\n");
+	
+	var lines = custom.split("\n");
+	for i in range(lines.size()):
+		lines[i] = lines[i].strip_edges();
+	
+	if (lines[0].find("AchronalDungeonStart") == -1):
+		print_message("Assert failed: Line 1 should start AchronalDungeonStart");
+		return null;
+	if (lines[(lines.size() - 1)] != "AchronalDungeonEnd"):
+		print_message("Assert failed: Last line should be AchronalDungeonEnd");
+		return null;
+	var json_parse_result = JSON.parse(lines[1])
+	
+	var result = null;
+	
+	if json_parse_result.error == OK:
+		var data = json_parse_result.result;
+		if typeof(data) == TYPE_DICTIONARY:
+			result = data;
+	
+	if (result == null):
+		print_message("Assert failed: Line 2 should be a valid dictionary")
+		return null;
+	
+	var metadatas = ["level_name", "level_author",
+	"hero_loc_start", "hero_hp_start", "hero_atk_start", "hero_def_start"
+	];
+	
+	for metadata in metadatas:
+		if (!result.has(metadata)):
+			print_message("Assert failed: Line 2 is missing " + metadata);
+			return null;
+			
+	#From here on out this is destructive! Just refresh if your level borks for now...
+	
+	var layers = 2;
+	var xx = 2;
+	var xxx = 0; #trying some different logic for this one - just count how many lines there have been so far
+	var terrain_layers = [];
+	for i in range(layers):
+		var layer_name = "FLOOR";
+		var tile_map = floormap;
+		if (i == 1):
+			layer_name = "MULTIPLIER";
+			tile_map = multipliermap;
+		var a = xx + xxx;
+		var header = lines[a];
+		if (header != "LAYER " + layer_name + ":"):
+			print_message("Assert failed: Line " + str(a) + " should be 'LAYER " + layer_name + ":'.");
+			return null;
+		tile_map.clear();
+		var j = 0;
+		var layer_line = lines[a + 1 + j];
+		while (layer_line.find(",") >= 0):
+			var layer_cells = layer_line.split(",");
+			for k in range(layer_cells.size()):
+				var layer_cell = layer_cells[k];
+				if (i == 1): #inverse of pretty print multipliers
+					#find_tile_by_name
+					var number = -1;
+					if (layer_cell.ends_with("K")):
+						number = int(layer_cell[0])*1000;
+					elif (layer_cell.ends_with("H")):
+						number = int(layer_cell[0])*100;
+					else:
+						number = int(layer_cell);
+					var id = multipliermap.tile_set.find_tile_by_name(str(number));
+					tile_map.set_cell(k, j, id);
+				else:
+					tile_map.set_cell(k, j, int(layer_cell));
+			j += 1;
+			layer_line = lines[a + 1 + j]; # at the end after j has incremented
+		xxx += j + 2;
+		terrain_layers.append(tile_map);
+	
+	for metadata in metadatas:
+		if (metadata == "hero_loc_start"): # guess I'll deserialize it myself *rolling up sleeves*
+			var pos = result[metadata];
+			pos = pos.trim_prefix("(");
+			pos = pos.trim_suffix(")");
+			pos = pos.split(",");
+			var x = int(pos[0]);
+			var y = int(pos[1]);
+			set(metadata, Vector2(x, y));
+		else:
+			set(metadata, result[metadata]);
+	
+	calculate_map_size();
+	greenality_avail = 0;
+	greenality_max = terrain_layers[0].get_used_cells_by_id(terrain_layers[0].tile_set.find_tile_by_name("Greenality")).size();
+	
+	return terrain_layers;
 	
 func is_valid_replay(replay: String) -> bool:
 	replay = replay.strip_edges();
