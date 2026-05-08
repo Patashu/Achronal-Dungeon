@@ -4,6 +4,7 @@ class_name LevelInfoEdit
 onready var gamelogic = get_tree().get_root().find_node("GameLogic", true, false);
 onready var holder : Control = get_node("Label");
 onready var okbutton : Button = get_node("Label/ButtonConfirm");
+onready var clearbutton : Button = get_node("Label/ButtonClear");
 onready var hero_atk_start : SpinBox = get_node("Label/HeroAtkStart");
 onready var hero_def_start : SpinBox = get_node("Label/HeroDefStart");
 onready var hero_hp_start: SpinBox = get_node("Label/HeroHPStart");
@@ -13,6 +14,7 @@ onready var level_author : TextEdit = get_node("Label/LevelAuthor");
 
 func _ready() -> void:
 	okbutton.connect("pressed", self, "destroy");
+	clearbutton.connect("pressed", self, "clear");
 	
 	var parent = get_parent();
 	
@@ -23,6 +25,12 @@ func _ready() -> void:
 	level_name.text = parent.level_name;
 	level_author.text = parent.level_author;
 
+func clear() -> void:
+	var parent = get_parent();
+	parent.floormap.clear();
+	parent.multipliermap.clear();
+	parent.print_message("Dungeon bulldozed to make way for new development.")
+	parent.meta_restart();
 
 func destroy() -> void:
 	var parent = get_parent();

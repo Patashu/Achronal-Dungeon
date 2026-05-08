@@ -140,3 +140,18 @@ custom_styles/pressed = ExtResource( 2 )
 custom_styles/focus = ExtResource( 2 )
 custom_styles/normal = ExtResource( 2 )
 text = "Ok"
+
+[node name="ButtonClear" type="Button" parent="Label"]
+margin_left = 150.0
+margin_top = 101.0
+margin_right = 214.0
+margin_bottom = 116.0
+custom_colors/font_color_disabled = Color( 0.756863, 0.54902, 0.447059, 1 )
+custom_colors/font_color_focus = Color( 0.988235, 0.921569, 0.713726, 1 )
+custom_colors/font_color = Color( 0.988235, 0.921569, 0.713726, 1 )
+custom_fonts/font = ExtResource( 3 )
+custom_styles/hover = ExtResource( 2 )
+custom_styles/pressed = ExtResource( 2 )
+custom_styles/focus = ExtResource( 2 )
+custom_styles/normal = ExtResource( 2 )
+text = "Clear Level!"
