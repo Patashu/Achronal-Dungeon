@@ -1532,16 +1532,17 @@ func _process(delta: float) -> void:
 		pen_xy = floormap.world_to_map(mouse_position);
 		var cell_size = floormap.cell_size;
 		pen.position = cell_size*(pen_xy+Vector2(1, 1))+floormap.position-cell_size/2;
+		pen.visible = true;
+		if (pen_xy.x >= 26 and pen_xy.y == 20): # disallow bottom buttons
+			pen.visible = false;
+		elif (pen_xy.x >= 33 and pen_xy.y <= 2): #disallow top buttons
+			pen.visible = false;
 		
-		var over_menu_button = false;
-		var draw_mode = levelinfobutton.get_draw_mode();
-		if (draw_mode == 1 or draw_mode == 3 or draw_mode == 4):
-			over_menu_button = true;
 		if (Input.is_mouse_button_pressed(1)):
-			if !over_menu_button:
+			if pen.visible:
 				lmb();
 		if (Input.is_mouse_button_pressed(2)):
-			if !over_menu_button:
+			if pen.visible:
 				rmb();
 		if (Input.is_action_just_released("mouse_wheel_up")):
 			picker_cycle(1);
